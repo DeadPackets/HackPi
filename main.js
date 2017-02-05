@@ -29,7 +29,7 @@ var https = require('https')
 var fs = require('fs');
 var auth = require('basic-auth');
 //var port = 443;
-var httpport = 80;
+var httpport = 1337; //This will be the HTTPS port later on
 /*var options = {
     key: fs.readFileSync('privkey/goes/here/privkey.pem'),
     cert: fs.readFileSync('cert/goes/here/cert.pem')
