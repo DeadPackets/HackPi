@@ -111,7 +111,7 @@ app.get('/auth', function(req, res) {
     var credentials = auth(req)
     if (!credentials || credentials.name !== 'username' || credentials.pass !== 'password') {
       res.statusCode = 401
-      res.setHeader('WWW-Authenticate', 'Basic realm="example"')
+      res.setHeader('WWW-Authenticate', 'Basic realm="auth"')
       res.end('Access denied')
     } else {
       log.debug(req.connection.remoteAddress + " GET /auth")
