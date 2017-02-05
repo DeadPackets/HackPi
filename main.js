@@ -128,5 +128,7 @@ app.use(function(req, res) {
 
 io.on('connection', function(socket, next) {
     log.info(socket.handshake.address + " has connected.")
+	socket.on('disconnect', function(){
+		log.warn(socket.handshake.address + " has disconnected.")
+	})
 })
-
