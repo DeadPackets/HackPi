@@ -102,7 +102,7 @@ app.use(express.static(__dirname + '/web'));
 
 app.get('/', function(req, res) {
     log.debug(req.connection.remoteAddress + " GET /")
-    res.sendFile('file');
+    res.sendFile('web/index.html');
 });
 
 /*
