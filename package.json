@@ -13,8 +13,10 @@
     "ifconfig-linux": "^0.1.0",
     "mysql": "^2.13.0",
     "node-wifi": "^1.2.2",
+    "os": "^0.1.1",
     "socket.io": "^1.7.2",
     "systeminformation": "^3.16.0",
+    "wifi": "0.0.2",
     "wifi-control": "^2.0.0"
   },
   "devDependencies": {},
