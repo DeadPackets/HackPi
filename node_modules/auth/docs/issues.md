@@ -1,0 +1,4 @@
+- How do we make sure that users are the owner's of particular documents?
+	- How do we do this efficiently?
+- How do we grant privileges for documents without writing a ton of code for each sharable collection?
+	- timer that checks for privileges to grant & remove at set intervals
