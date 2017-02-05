@@ -1,0 +1,22 @@
+{
+  "name": "HackPi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "fs": "^0.0.2",
+    "http": "^0.0.0",
+    "ifconfig-linux": "^0.1.0",
+    "node-wifi": "^1.2.2",
+    "socket.io": "^1.7.2",
+    "systeminformation": "^3.16.0",
+    "wifi-control": "^2.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lucid",
+  "license": "ISC"
+}

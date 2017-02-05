@@ -1,0 +1,18 @@
+{
+  "globalDevDependencies": {
+    "chai": "registry:dt/chai#3.4.0+20160601211834",
+    "gulp": "registry:dt/gulp#3.8.0+20160907112908",
+    "gulp-concat": "registry:dt/gulp-concat#0.0.0+20160316155526",
+    "gulp-filter": "registry:dt/gulp-filter#3.0.1+20160316155526",
+    "gulp-mocha": "registry:dt/gulp-mocha#0.0.0+20160316155526",
+    "gulp-sourcemaps": "registry:dt/gulp-sourcemaps#0.0.0+20160316155526",
+    "gulp-typescript": "registry:dt/gulp-typescript#0.0.0+20160317120654",
+    "gulp-util": "registry:dt/gulp-util#0.0.0+20160316155526",
+    "mocha": "registry:dt/mocha#2.2.5+20161028141524",
+    "node": "registry:dt/node#6.0.0+20161121110008",
+    "typescript": "registry:dt/typescript#0.4.0+20160317120654"
+  },
+  "globalDependencies": {
+    "bluebird": "registry:dt/bluebird#3.0.0+20161007114152"
+  }
+}

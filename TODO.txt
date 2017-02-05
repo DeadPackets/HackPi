@@ -1,0 +1,14 @@
+- Rogue AP Attack
+- RogueAP phishing
+- RogueAP exploiting
+- Auto Bridging Interfaces
+- RogueAP Dashboard
+- Bluetooth compatability and scanning/jamming
+- Bluetooth hacking
+- RaspberryPi sys info
+- LoginPortal Bypass (for wifi)
+- Auto NMAP of connected hosts (RogueAP exploit addition)
+- If upstream, enable MiTM
+- WPA2 crack list
+- If upstream, enable C&C communications to crack hashes and more
+
