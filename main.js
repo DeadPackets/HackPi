@@ -19,21 +19,43 @@ TODO:
 - Commandline
 - Process killing (HackPi related)
 */
+
 var os = require('os');
 var wifi = require('wifi');
 var express = require('express');
 const colors = require('colors');
 var app = express();
-var http = require('http')
 var https = require('https')
 var fs = require('fs');
 var auth = require('basic-auth');
-//var port = 443;
-var httpport = 1337; //This will be the HTTPS port later on
-/*var options = {
-    key: fs.readFileSync('privkey/goes/here/privkey.pem'),
-    cert: fs.readFileSync('cert/goes/here/cert.pem')
+var config = require(__dirname + '/config/config.json')
+var port = 1337;
+var ttyport = 13370;
+var options = {
+    key: fs.readFileSync(__dirname + '/ssl/server.key'),
+    cert: fs.readFileSync(__dirname + '/ssl/server.cert')
 };
+
+var tty = require('tty.js');
+
+var ttyapp = tty.createServer({
+  shell: 'bash',
+  users: {
+    HackPi: ''
+  },
+	cwd: ".",
+	localOnly: false,
+	https: {
+		key: __dirname + "/ssl/server.key",
+		cert: __dirname + "/ssl/server.cert"
+	},
+  port: ttyport //change this?
+});
+
+ttyapp.listen()
+
+
+/*
 const mysql = require('mysql');
 var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
 
@@ -75,28 +97,12 @@ function ListHostapdClients(){
   
 }
 
-//Starting up HTTP and HTTPS
-//var server = https.createServer(options, app).listen(port, function() {
-//    log.info("Express server listening on port " + port);
-//});
-
-var serverhttp = http.createServer(app).listen(httpport, function() {
-    log.info("Express server listening on port " + httpport);
+var server = https.createServer(options, app).listen(port, function() {
+    log.info("Express server listening on port " + port);
 });
-serverhttp.listen(80);
 
 //SOCKET.IO INIT
-var io = require('socket.io')(serverhttp) //CHANGE TO SECURE LATER
-
-/*app.use(function(req, res, next) {
-    if (req.secure) {
-        next();
-    } else {
-        // request was via http, so redirect to https
-        res.redirect('https://' + req.headers.host + req.url); //req.headers.host
-        log.debug("Redirected" + req.connection.remoteAddress + " to HTTPS.");
-    }
-});*/
+var io = require('socket.io')(server) //CHANGE TO SECURE LATER
 
 app.use(express.static(__dirname + '/web'));
 
@@ -128,7 +134,9 @@ app.use(function(req, res) {
 
 io.on('connection', function(socket, next) {
     log.info(socket.handshake.address + " has connected.")
+		
 	socket.on('disconnect', function(){
 		log.warn(socket.handshake.address + " has disconnected.")
 	})
+	
 })

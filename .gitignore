@@ -41,3 +41,6 @@ ssl/*
 
 # Ignore files inside the tools folder - let the client pull them
 tools/*
+
+# Ignore config file
+config/*
