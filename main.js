@@ -112,7 +112,6 @@ function GetRAMInfo() {
 	var totalmem = os.totalmem()
 	var usedmem = totalmem - freemem
 }
-GetRAMInfo()
 
 function GetUptime() {
 	return secondsToString(os.uptime())
