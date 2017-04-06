@@ -83,20 +83,45 @@ function secondsToString(seconds) {
 
 
 function GetCPUInfo() {
-	var cpuspeed = si.cpuCurrentspeed(function(data){
-		console.log(data)
+	var cpuspeed = si.cpuCurrentspeed(function(data) {
+		return data
+	})
+
+	var cputemp = si.cpuTemperature(function(data) {
+		return data
+	})
+
+	var cpuload = si.currentLoad(function(data) {
+		return data
 	})
 	
-	var cputemp = si.cpuTemperature(function(data){
-		console.log(data)
-	})
-	
-	var cpuload = si.currentLoad(function(data){
-		console.log(data)
-	})
+	var result = {
+		cpusspeed: cpuspeed,
+		cputemp: cputemp,
+		cpuload: cpuload
+	}
+	return result
 }
 
-GetCPUInfo()
+
+function GetFsInfo() {
+	var fssize = si.fsSize(function(data) {
+		return data
+	})
+	var ioinfo = si.disksIO(function(data){
+		return data
+	})
+	var rwinfo = si.fsStats(function(data){
+		return data
+	})
+	
+	var fsinfo = {
+		fssize: fssize,
+		ioinfo: ioinfo,
+		rwinfo: rwinfo
+	}
+	return fsinfo;
+}
 
 function GetInterfaceInfo() {
 	var interfaces = os.networkInterfaces()
@@ -118,6 +143,12 @@ function GetRAMInfo() {
 		usedmem: usedmem
 	}
 	return result
+}
+
+function GetSwapInfo() {
+	var swapinfo = si.mem(function(data) {
+		return data
+	})
 }
 
 function GetUptime() {
@@ -174,24 +205,26 @@ app.use(function(req, res) {
 io.on('connection', function(socket, next) {
 	log.info(socket.handshake.address + " has connected.")
 
-	
-	socket.on('system-info', function(){
+
+	socket.on('system-info', function() {
 		var sysinfo = {
 			uptime: GetUptime(),
 			raminfo: GetRAMInfo(),
-			
+			swalinfo: GetSwapInfo(),
+			cpuinfo: GetCPUInfo(),
+			fsspace: GetFsInfo()
 		}
 	})
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	socket.on('disconnect', function() {
 		log.warn(socket.handshake.address + " has disconnected.")
 	})
