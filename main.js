@@ -10,13 +10,11 @@ TODO:
 - Add Bluetooth scanning + jacking
 - Add Interface Bridging
 - Login to Web Console
-- Security?
 - System Info
 - Reboot functions
-- Shutdown (kill all processes related to HackPi and close main NodeJS)
+- Shutdown (kill all processes related to HackPi and close main NodeJS) //Needs work
 - Hostapd clients connected
 - Interface identification
-- Commandline
 - Process killing (HackPi related)
 */
 
@@ -38,19 +36,12 @@ var options = {
 	cert: fs.readFileSync(__dirname + '/ssl/server.cert')
 };
 
-var ttyapp = tty.createServer({
-	shell: 'bash',
-	users: {
-		HackPi: ''
-	},
-	cwd: ".",
-	localOnly: false,
-	https: {
-		key: __dirname + "/ssl/server.key",
-		cert: __dirname + "/ssl/server.cert"
-	},
-	port: ttyport //change this?
-});
+//Wireless tools
+var hostapd = require('wireless-tools/hostapd');
+var ifconfig = require('wireless-tools/ifconfig');
+var iwlist = require('wireless-tools/iwlist');
+var iw = require('wireless-tools/iw');
+var udhcpc = require('wireless-tools/udhcpc');
 
 /*
 const mysql = require('mysql');
@@ -90,6 +81,19 @@ function secondsToString(seconds) {
 	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
 }
 
+
+function GetCPUInfo() {
+	var cpuspeed = si.cpuCurrentSpeed(function(data){
+		console.log(data)
+	})
+	
+	var cputemp = si.cpuTemperatures(function(data){
+		console.log(data)
+	})
+	
+	
+}
+
 function GetInterfaceInfo() {
 	var interfaces = os.networkInterfaces()
 	for (var key in p) {
@@ -103,9 +107,13 @@ function GetInterfaceInfo() {
 }
 
 function GetRAMInfo() {
-	var freemem = os.freemem()
-	var totalmem = os.totalmem()
-	var usedmem = totalmem - freemem
+	var usedmem = os.totalmem() - os.freemem()
+	var result = {
+		freemem: os.freemem(),
+		totalmem: os.totalmem(),
+		usedmem: usedmem
+	}
+	return result
 }
 
 function GetUptime() {
@@ -162,6 +170,24 @@ app.use(function(req, res) {
 io.on('connection', function(socket, next) {
 	log.info(socket.handshake.address + " has connected.")
 
+	
+	socket.on('system-info', function(){
+		var sysinfo = {
+			uptime: GetUptime(),
+			raminfo: GetRAMInfo(),
+			
+		}
+	})
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	socket.on('disconnect', function() {
 		log.warn(socket.handshake.address + " has disconnected.")
 	})
