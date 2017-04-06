@@ -38,8 +38,6 @@ var options = {
 	cert: fs.readFileSync(__dirname + '/ssl/server.cert')
 };
 
-var tty = require('tty.js');
-
 var ttyapp = tty.createServer({
 	shell: 'bash',
 	users: {
@@ -53,9 +51,6 @@ var ttyapp = tty.createServer({
 	},
 	port: ttyport //change this?
 });
-
-ttyapp.listen()
-
 
 /*
 const mysql = require('mysql');
