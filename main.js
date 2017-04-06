@@ -28,7 +28,9 @@ var app = express();
 var https = require('https')
 var fs = require('fs');
 var auth = require('basic-auth');
+var si = require('systeminformation');
 var config = require(__dirname + '/config/config.json')
+var exec = require('child_process').exec;
 var port = 1337;
 var ttyport = 13370;
 var options = {
@@ -109,9 +111,6 @@ function GetRAMInfo() {
 	var freemem = os.freemem()
 	var totalmem = os.totalmem()
 	var usedmem = totalmem - freemem
-	console.log("Free: " + freemem / 1073741824 + " GB")
-	console.log("Total: " + totalmem / 1073741824 + " GB")
-	console.log("Used: " + usedmem / 1073741824 + " GB")
 }
 GetRAMInfo()
 
@@ -123,12 +122,20 @@ function ListHostapdClients() {
 
 }
 
+function RebootSystem() {
+	exec('shutdown -r now')
+}
+
+function ShutdownSystem() {
+	exec('shutdown -P now')
+}
+
 var server = https.createServer(options, app).listen(port, function() {
 	log.info("Express server listening on port " + port);
 });
 
 //SOCKET.IO INIT
-var io = require('socket.io')(server) //CHANGE TO SECURE LATER
+var io = require('socket.io')(server)``
 
 app.use(express.static(__dirname + '/web'));
 
