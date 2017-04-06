@@ -32,24 +32,24 @@ var config = require(__dirname + '/config/config.json')
 var port = 1337;
 var ttyport = 13370;
 var options = {
-    key: fs.readFileSync(__dirname + '/ssl/server.key'),
-    cert: fs.readFileSync(__dirname + '/ssl/server.cert')
+	key: fs.readFileSync(__dirname + '/ssl/server.key'),
+	cert: fs.readFileSync(__dirname + '/ssl/server.cert')
 };
 
 var tty = require('tty.js');
 
 var ttyapp = tty.createServer({
-  shell: 'bash',
-  users: {
-    HackPi: ''
-  },
+	shell: 'bash',
+	users: {
+		HackPi: ''
+	},
 	cwd: ".",
 	localOnly: false,
 	https: {
 		key: __dirname + "/ssl/server.key",
 		cert: __dirname + "/ssl/server.cert"
 	},
-  port: ttyport //change this?
+	port: ttyport //change this?
 });
 
 ttyapp.listen()
@@ -67,38 +67,64 @@ setInterval(function() {
 */
 //Logging functions
 var log = {
-    error: function(data) {
-        var date = new Date();
-        console.log('ERROR'.red, data);
-    },
-    info: function(data) {
-        var date = new Date();
-        console.log('INFO'.green, data);
-    },
-    warn: function(data) {
-        var date = new Date();
-        console.log('WARN'.yellow, data);
-    },
-    debug: function(data) {
-        console.log('DEBUG'.blue, data);
-    }
+	error: function(data) {
+		var date = new Date();
+		console.log('ERROR'.red, data);
+	},
+	info: function(data) {
+		var date = new Date();
+		console.log('INFO'.green, data);
+	},
+	warn: function(data) {
+		var date = new Date();
+		console.log('WARN'.yellow, data);
+	},
+	debug: function(data) {
+		console.log('DEBUG'.blue, data);
+	}
 }
 
 //Functions
-function GetInterfaceInfo(){
+function secondsToString(seconds) {
+	var numdays = Math.floor(seconds / 86400);
+	var numhours = Math.floor((seconds % 86400) / 3600);
+	var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
+	var numseconds = ((seconds % 86400) % 3600) % 60;
+	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
+}
+
+function GetInterfaceInfo() {
+	var interfaces = os.networkInterfaces()
+	for (var key in p) {
+		if (p.hasOwnProperty(key)) {
+			p[key].forEach(function(item, index) {
+				return item
+			})
+		}
+	}
 
 }
 
-function GetUptime(){
+function GetRAMInfo() {
+	var freemem = os.freemem()
+	var totalmem = os.totalmem()
+	var usedmem = totalmem - freemem
+	console.log("Free: " + freemem / 1073741824 + " GB")
+	console.log("Total: " + totalmem / 1073741824 + " GB")
+	console.log("Used: " + usedmem / 1073741824 + " GB")
+}
+GetRAMInfo()
 
+function GetUptime() {
+	return secondsToString(os.uptime())
 }
 
-function ListHostapdClients(){
-  
+function ListHostapdClients() {
+
 }
 
 var server = https.createServer(options, app).listen(port, function() {
-    log.info("Express server listening on port " + port);
+	log.info("Express server listening on port " + port);
 });
 
 //SOCKET.IO INIT
@@ -107,8 +133,8 @@ var io = require('socket.io')(server) //CHANGE TO SECURE LATER
 app.use(express.static(__dirname + '/web'));
 
 app.get('/', function(req, res) {
-    log.debug(req.connection.remoteAddress + " GET /")
-    res.sendFile('web/index.html');
+	log.debug(req.connection.remoteAddress + " GET /")
+	res.sendFile('web/index.html');
 });
 
 /*
@@ -128,15 +154,15 @@ app.get('/auth', function(req, res) {
 
 //Custom 404
 app.use(function(req, res) {
-    res.send('404: Page not Found').status(404);
-    log.warn(req.connection.remoteAddress + " [404] GET " + req.url)
+	res.send('404: Page not Found').status(404);
+	log.warn(req.connection.remoteAddress + " [404] GET " + req.url)
 });
 
 io.on('connection', function(socket, next) {
-    log.info(socket.handshake.address + " has connected.")
-		
-	socket.on('disconnect', function(){
+	log.info(socket.handshake.address + " has connected.")
+
+	socket.on('disconnect', function() {
 		log.warn(socket.handshake.address + " has disconnected.")
 	})
-	
+
 })
