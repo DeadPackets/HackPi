@@ -91,7 +91,11 @@ function GetCPUInfo() {
 		console.log(data)
 	})
 	
+	var cpuload = si.currentLoad(function(data){
+		console.log(data)
+	})
 }
+
 GetCPUInfo()
 
 function GetInterfaceInfo() {
