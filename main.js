@@ -83,16 +83,16 @@ function secondsToString(seconds) {
 
 
 function GetCPUInfo() {
-	var cpuspeed = si.cpuCurrentSpeed(function(data){
+	var cpuspeed = si.cpuCurrentspeed(function(data){
 		console.log(data)
 	})
 	
-	var cputemp = si.cpuTemperatures(function(data){
+	var cputemp = si.cpuTemperature(function(data){
 		console.log(data)
 	})
-	
 	
 }
+GetCPUInfo()
 
 function GetInterfaceInfo() {
 	var interfaces = os.networkInterfaces()
@@ -137,7 +137,7 @@ var server = https.createServer(options, app).listen(port, function() {
 });
 
 //SOCKET.IO INIT
-var io = require('socket.io')(server)``
+var io = require('socket.io')(server)
 
 app.use(express.static(__dirname + '/web'));
 
