@@ -4,6 +4,7 @@ import si from 'systeminformation';
 import { exec } from 'child_process';
 import hostapd from 'wireless-tools/hostapd';
 import ifconfig from 'wireless-tools/ifconfig';
+import iwconfig from 'wireless-tools/iwconfig';
 import iwlist from 'wireless-tools/iwlist';
 import iw from 'wireless-tools/iw';
 import udhcpc from 'wireless-tools/udhcpc';
@@ -16,57 +17,30 @@ const secondsToString = (seconds) => {
 	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
 }
 
-export const GetCPUInfo = () => {
-	var cpuspeed = si.cpuCurrentspeed(function(data) {
-		return data
+export const GetCPUInfo = (cb) => {
+	si.cpuCurrentspeed(function(speed) {
+		si.cpuTemperature(function(temp) {
+			si.currentLoad(function(load) {
+				cb({ speed, temp, load })
+			})
+		})
 	})
-
-	var cputemp = si.cpuTemperature(function(data) {
-		return data
-	})
-
-	var cpuload = si.currentLoad(function(data) {
-		return data
-	})
-
-	var result = {
-		cpusspeed: cpuspeed,
-		cputemp: cputemp,
-		cpuload: cpuload
-	}
-	return result
 }
 
-
-export const GetFsInfo = () => {
-	var fssize = si.fsSize(function(data) {
-		return data
+export const GetFsInfo = (cb) => {
+	var fssize = si.fsSize(function(fssize) {
+		var ioinfo = si.disksIO(function(ioinfo){
+			var rwinfo = si.fsStats(function(rwinfo){
+				cb({ fssize, ioinfo, rwinfo })
+			})
+		})
 	})
-	var ioinfo = si.disksIO(function(data){
-		return data
-	})
-	var rwinfo = si.fsStats(function(data){
-		return data
-	})
-
-	var fsinfo = {
-		fssize: fssize,
-		ioinfo: ioinfo,
-		rwinfo: rwinfo
-	}
-	return fsinfo;
 }
 
 export const GetInterfaceInfo = () => {
-	var interfaces = os.networkInterfaces()
-	for (var key in p) {
-		if (p.hasOwnProperty(key)) {
-			p[key].forEach(function(item, index) {
-				return item
-			})
-		}
-	}
-
+	ifconfig.status((error, data)=>{
+		console.log(error, data)
+	})
 }
 
 export const GetRAMInfo = () => {
