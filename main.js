@@ -121,9 +121,9 @@ function GetFsInfo() {
 
 function GetInterfaceInfo() {
 	var interfaces = os.networkInterfaces()
-	for (var key in p) {
-		if (p.hasOwnProperty(key)) {
-			p[key].forEach(function(item, index) {
+	for (var key in interfaces) {
+		if (interfaces.hasOwnProperty(key)) {
+			interfaces[key].forEach(function(item, index) {
 				return item
 			})
 		}
