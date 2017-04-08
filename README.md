@@ -4,16 +4,19 @@
 ---
 HackPi is a NodeJS project to turn a raspberry pi running kali into a fully portable hacking device.
 
+
 ### Features
+---
 - Realtime updates using Socket.io
 - Online terminal with https (auto starts on boot)
 - Ad-hoc style access point for connectivity that starts on boot
 - System stats 
 
+
 ### Todo
+---
 - Update the Features (xD)
 - Work on at least inital client side
-- 
 - Client side system information
 - Listing available network interfaces
 - Listing available WiFi points
