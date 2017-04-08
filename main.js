@@ -138,6 +138,18 @@ function BringIfaceUp(callback) {
 	//todo
 }
 
+function ScanWiFi(interface){
+	if (interface == 'wlan0') {
+		//deny, since wlan0 is in monitor mode
+	} else {
+		//todo
+	}
+}
+
+function ConnectToWifi(interface, mac, ssid) {
+	//todo
+}
+
 function GetRAMInfo() {
 	var usedmem = os.totalmem() - os.freemem()
 	var result = {
