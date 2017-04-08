@@ -130,6 +130,14 @@ function GetInterfaceInfo() {
 	}
 }
 
+function BringIfaceDown(callback) {
+	//todo
+}
+
+function BringIfaceUp(callback) {
+	//todo
+}
+
 function GetRAMInfo() {
 	var usedmem = os.totalmem() - os.freemem()
 	var result = {
