@@ -8,70 +8,83 @@ import iwconfig from 'wireless-tools/iwconfig';
 import iwlist from 'wireless-tools/iwlist';
 import iw from 'wireless-tools/iw';
 import udhcpc from 'wireless-tools/udhcpc';
+import os from 'os';
 
-const secondsToString = (seconds) => {
-	var numdays = Math.floor(seconds / 86400);
-	var numhours = Math.floor((seconds % 86400) / 3600);
-	var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
-	var numseconds = ((seconds % 86400) % 3600) % 60;
-	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
-}
+import SYSINFO from '../main';
 
-export const GetCPUInfo = (cb) => {
+setInterval(()=>{
+	//i should probably change this, eeh, later
+	UpdateCPUInfo(()=>{
+		UpdateFSInfo(()=>{
+			UpdateRAMInfo(()=>{
+				UpdateInterfaceInfo(()=>{
+					UpdateSwapInfo(()=>{
+						UpdateUptime()
+					})
+				})
+			})
+		})
+	})
+}, 1000)
+
+export const UpdateCPUInfo = (cb) => {
 	si.cpuCurrentspeed(function(speed) {
 		si.cpuTemperature(function(temp) {
 			si.currentLoad(function(load) {
-				cb({ speed, temp, load })
+				SYSINFO.cpu = { speed, temp, load }
+				cb()
 			})
 		})
 	})
 }
 
-export const GetFsInfo = (cb) => {
+export const UpdateFSInfo = (cb) => {
 	var fssize = si.fsSize(function(fssize) {
 		var ioinfo = si.disksIO(function(ioinfo){
 			var rwinfo = si.fsStats(function(rwinfo){
-				cb({ fssize, ioinfo, rwinfo })
+				SYSINFO.fs = { fssize, ioinfo, rwinfo }
+				cb()
 			})
 		})
 	})
 }
 
-export const GetInterfaceInfo = () => {
-	ifconfig.status((error, data)=>{
-		console.log(error, data)
+export const UpdateInterfaceInfo = (cb) => {
+	ifconfig.status((error, interfaces)=>{
+		interfaces.every((i)=>{
+			SYSINFO.interfaces[i.interface] = i;
+			cb()
+		})
 	})
 }
 
-export const GetRAMInfo = () => {
+export const UpdateRAMInfo = (cb) => {
 	var usedmem = os.totalmem() - os.freemem()
-	var result = {
-		freemem: os.freemem(),
-		totalmem: os.totalmem(),
-		usedmem: usedmem
+	SYSINFO.mem = {
+		free: os.freemem(),
+		total: os.totalmem(),
+		used: usedmem
 	}
-	return result
+	cb()
 }
 
-export const GetSwapInfo = () => {
+export const UpdateSwapInfo = (cb) => {
 	var swapinfo = si.mem(function(data) {
-		return data
+		SYSINFO.swap = data;
+		cb()
 	})
 }
 
-export const GetUptime = () => {
-	return secondsToString(os.uptime())
+export const UpdateUptime = () => {
+	 SYSINFO.osuptime = os.uptime()
+	 SYSINFO.uptime = process.uptime()
 }
 
-/*export const ListHostapdClients = () => {
-
-}*/
-
-export const RebootSystem = () => {
+export const Reboot = () => {
 	exec('shutdown -r now')
 }
 
-export const ShutdownSystem = () => {
+export const Shutdown = () => {
 	exec('shutdown -P now')
 }
 
