@@ -26,23 +26,37 @@
 			var family = iface_array[i].family
 			var netmask = iface_array[i].netmask //is this even needed?
 			var scopeid = iface_array[i].scopeid //same here, is this needed?
-			console.log(address)
 		}
 	}
 	function DisplayRAMData(data){
-		console.log(data)
+		var freemem = data.freemem / 1073741824
+		var usedmem = data.usedmem / 1073741824
+		var totalmem = data.totalmem / 1073741824
 	}
 	function DisplayCPUData(data){
-		console.log(data)
+		var cpuspeed = data.currentspeed.avg
+		var loadpercent = data.currentload.avgload
+		var cputemp = data.cputemp.main
 	}
 	function DisplaySwapData(data){
-		console.log(data)
+		var freeswap = data.swapfree
+		var usedswap = data.swapused
+		var totalswap = data.swaptotal
 	}
 	function DisplayFsData(data){
-		console.log(data)
+		var readIO = data.ioinfo.rIO / 1024
+		var writeIO = data.ioinfo.wIO / 1024
+		for (var i = 0; i < data.fsSize.length; i++){
+			var disk = data.fsSize[i].fs
+			var mountpoint = data.fsSize[i].mount
+			var type = data.fsSize[i].type
+			var totalspace = data.fsSize[i].size / 1073741824
+			var usedpercent = data.fsSize[i].use
+			var usedspace = data.fsSize[i].used / 1073741824
+		}
 	}
 	function DisplayUptime(data){
-		console.log(data)
+		var uptime = data
 	}
 	
 	socket.on('interfaces result', function(data){
@@ -53,17 +67,17 @@
 		});
 	})
 	
+	/*
 	setInterval(function(){
 		socket.emit('system info')
 	}, 1000)
-	
+	*/
 	socket.on('system info results', function(data){
 		DisplayRAMData(data.raminfo)
 		DisplayCPUData(data.cpuinfo)
 		DisplaySwapData(data.swapinfo)
 		DisplayFsData(data.fsinfo)
 		DisplayUptime(data.uptime)
-		
 	})
 </script>
 </html>
