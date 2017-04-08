@@ -18,6 +18,11 @@ TODO:
 - Process killing (HackPi related)
 */
 
+/*
+In Progress:
+- Interface info
+*/
+
 var os = require('os');
 var wifi = require('wifi');
 var express = require('express');
@@ -27,7 +32,7 @@ var https = require('https')
 var fs = require('fs');
 var auth = require('basic-auth');
 var si = require('systeminformation');
-var config = require(__dirname + '/config/config.json')
+//var config = require(__dirname + '/config/config.json') //not needed for now
 var exec = require('child_process').exec;
 var port = 1337;
 var ttyport = 13370;
@@ -46,13 +51,8 @@ var udhcpc = require('wireless-tools/udhcpc');
 /*
 const mysql = require('mysql');
 var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
-
-//Prevents MySQL Database from dying
-setInterval(function() {
-    sql.query('SELECT 1');
-}, 10000);
-
 */
+
 //Logging functions
 var log = {
 	error: function(data) {
@@ -86,15 +86,12 @@ function GetCPUInfo() {
 	var cpuspeed = si.cpuCurrentspeed(function(data) {
 		return data
 	})
-
 	var cputemp = si.cpuTemperature(function(data) {
 		return data
 	})
-
 	var cpuload = si.currentLoad(function(data) {
 		return data
 	})
-	
 	var result = {
 		cpusspeed: cpuspeed,
 		cputemp: cputemp,
@@ -114,7 +111,6 @@ function GetFsInfo() {
 	var rwinfo = si.fsStats(function(data){
 		return data
 	})
-	
 	var fsinfo = {
 		fssize: fssize,
 		ioinfo: ioinfo,
@@ -132,7 +128,6 @@ function GetInterfaceInfo() {
 			})
 		}
 	}
-
 }
 
 function GetRAMInfo() {
@@ -156,7 +151,7 @@ function GetUptime() {
 }
 
 function ListHostapdClients() {
-
+//still thinking about this, should it be fixed for wlan0 or should it be flexible?
 }
 
 function RebootSystem() {
@@ -203,7 +198,7 @@ app.use(function(req, res) {
 });
 
 io.on('connection', function(socket, next) {
-	log.info(socket.handshake.address + " has connected.")
+	log.info(socket.handshake.address + " has connected.") //is this needed? should we log to a file?
 
 
 	socket.on('system-info', function() {
@@ -216,17 +211,8 @@ io.on('connection', function(socket, next) {
 		}
 	})
 
-
-
-
-
-
-
-
-
-
 	socket.on('disconnect', function() {
-		log.warn(socket.handshake.address + " has disconnected.")
+		log.warn(socket.handshake.address + " has disconnected.") //needed? or log to file instead?
 	})
 
 })
