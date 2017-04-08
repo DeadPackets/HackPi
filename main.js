@@ -1,3 +1,5 @@
+require("babel-core").transform("code");
+
 import IO from 'socket.io';
 
 import {
@@ -9,7 +11,7 @@ import {
 	Log
 } from './fn';
 
-import config from './config/config.json';
+//import config from './config/config.json';
 
 const io = IO(8080);
 
@@ -20,7 +22,7 @@ io.on('connection', (socket) => {
 		next();
 	})
 
-	socket.on('system info', (callback) => {
+	socket.on('get system info', (callback) => {
 		if(callback && typeof callback === 'function')
 			callback({
 				uptime: GetUptime(),

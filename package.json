@@ -20,12 +20,15 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-preset-env": "^1.3.3",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "basic-auth": "^1.1.0"
+    "nodemon": "^1.11.0"
   },
   "scripts": {
-    "start": "babel-node index.js --presets es2015,stage-2",
-    "dev": "nodemon index.js --exec babel-node --presets es2015,stage-2"
+    "start": "babel-node main.js --presets es2015,stage-2",
+    "dev": "nodemon main.js --exec babel-node --presets es2015,stage-2"
   },
   "author": "Infirmos",
   "license": "ISC"

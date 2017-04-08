@@ -16,7 +16,6 @@ const secondsToString = (seconds) => {
 	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
 }
 
-
 export const GetCPUInfo = () => {
 	var cpuspeed = si.cpuCurrentspeed(function(data) {
 		return data
@@ -90,9 +89,9 @@ export const GetUptime = () => {
 	return secondsToString(os.uptime())
 }
 
-export const ListHostapdClients() {
+/*export const ListHostapdClients = () => {
 
-}
+}*/
 
 export const RebootSystem = () => {
 	exec('shutdown -r now')
