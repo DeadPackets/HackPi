@@ -9,7 +9,7 @@ import {
 	GetCPUInfo,
 	GetFsInfo,
 	Log
-} from './fn';
+} from './functions/fn';
 
 //import config from './config/config.json';
 
