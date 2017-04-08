@@ -2,12 +2,68 @@
 <head>
 	<title>HackPi</title>
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
-	<h1>It works!</h1>
-	<p class="test"></p>
+<div id="list-interfaces">
+	<h1>
+		List Interfaces
+	</h1>
+	<br>
+	<div id="list-interfaces-results">
+		
+	</div>
+	</div>
 </body>
 <script>
 	var socket = io.connect()
+	
+	function DisplayInterfaces(iface_array){
+		for (var i = 0; i < iface_array.length; i++){
+			var address = iface_array[i].address
+			var isinternal = iface_array[i].internal
+			var mac = iface_array[i].mac
+			var family = iface_array[i].family
+			var netmask = iface_array[i].netmask //is this even needed?
+			var scopeid = iface_array[i].scopeid //same here, is this needed?
+			console.log(address)
+		}
+	}
+	function DisplayRAMData(data){
+		console.log(data)
+	}
+	function DisplayCPUData(data){
+		console.log(data)
+	}
+	function DisplaySwapData(data){
+		console.log(data)
+	}
+	function DisplayFsData(data){
+		console.log(data)
+	}
+	function DisplayUptime(data){
+		console.log(data)
+	}
+	
+	socket.on('interfaces result', function(data){
+		Object.keys(data).forEach(function(key) {
+    var iface = key
+		var info = data[key]
+		DisplayInterfaces(info)
+		});
+	})
+	
+	setInterval(function(){
+		socket.emit('system info')
+	}, 1000)
+	
+	socket.on('system info results', function(data){
+		DisplayRAMData(data.raminfo)
+		DisplayCPUData(data.cpuinfo)
+		DisplaySwapData(data.swapinfo)
+		DisplayFsData(data.fsinfo)
+		DisplayUptime(data.uptime)
+		
+	})
 </script>
 </html>

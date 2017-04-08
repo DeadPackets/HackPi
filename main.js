@@ -48,10 +48,19 @@ var iwlist = require('wireless-tools/iwlist');
 var iw = require('wireless-tools/iw');
 var udhcpc = require('wireless-tools/udhcpc');
 
+
+//Global variables
+var interfaces;
+var uptime;
+var cpuinfo = {}
+var raminfo = {}
+var fsinfo = {}
+var swapinfo = {}
+var sysinfo = {}
 /*
-const mysql = require('mysql');
-var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
-*/
+	const mysql = require('mysql');
+	var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
+	*/
 
 //Logging functions
 var log = {
@@ -72,7 +81,22 @@ var log = {
 	}
 }
 
-//Functions
+setInterval(function() {
+		GetCPUInfo()
+		GetFsInfo()
+		GetRAMInfo()
+		GetSwapInfo()
+		GetUptime()
+		sysinfo = {
+			cpuinfo: cpuinfo,
+			raminfo: raminfo,
+			fsinfo: fsinfo,
+			swapinfo: swapinfo,
+			uptime: uptime
+		}
+	}, 1000)
+
+	//Functions
 function secondsToString(seconds) {
 	var numdays = Math.floor(seconds / 86400);
 	var numhours = Math.floor((seconds % 86400) / 3600);
@@ -83,51 +107,32 @@ function secondsToString(seconds) {
 
 
 function GetCPUInfo() {
-	var cpuspeed = si.cpuCurrentspeed(function(data) {
-		return data
+	si.cpuCurrentspeed(function(data) {
+		cpuinfo.currentspeed = data
 	})
-	var cputemp = si.cpuTemperature(function(data) {
-		return data
+	si.cpuTemperature(function(data) {
+		cpuinfo.cputemp = data
 	})
-	var cpuload = si.currentLoad(function(data) {
-		return data
+	si.currentLoad(function(data) {
+		cpuinfo.currentload = data
 	})
-	var result = {
-		cpusspeed: cpuspeed,
-		cputemp: cputemp,
-		cpuload: cpuload
-	}
-	return result
 }
 
 
 function GetFsInfo() {
-	var fssize = si.fsSize(function(data) {
-		return data
+	si.fsSize(function(data) {
+		fsinfo.fsSize = data
 	})
-	var ioinfo = si.disksIO(function(data){
-		return data
+	si.disksIO(function(data) {
+		fsinfo.ioinfo = data
 	})
-	var rwinfo = si.fsStats(function(data){
-		return data
+	si.fsStats(function(data) {
+		fs.rwinfo = data
 	})
-	var fsinfo = {
-		fssize: fssize,
-		ioinfo: ioinfo,
-		rwinfo: rwinfo
-	}
-	return fsinfo;
 }
 
 function GetInterfaceInfo() {
-	var interfaces = os.networkInterfaces()
-	for (var key in interfaces) {
-		if (interfaces.hasOwnProperty(key)) {
-			interfaces[key].forEach(function(item, index) {
-				return item
-			})
-		}
-	}
+	interfaces = os.networkInterfaces()
 }
 
 function BringIfaceDown(callback) {
@@ -138,7 +143,7 @@ function BringIfaceUp(callback) {
 	//todo
 }
 
-function ScanWiFi(interface){
+function ScanWiFi(interface) {
 	if (interface == 'wlan0') {
 		//deny, since wlan0 is in monitor mode
 	} else {
@@ -151,27 +156,23 @@ function ConnectToWifi(interface, mac, ssid) {
 }
 
 function GetRAMInfo() {
-	var usedmem = os.totalmem() - os.freemem()
-	var result = {
-		freemem: os.freemem(),
-		totalmem: os.totalmem(),
-		usedmem: usedmem
-	}
-	return result
+	raminfo.freemem = os.freemem()
+	raminfo.totalmem = os.totalmem()
+	raminfo.usedmem = os.totalmem() - os.freemem()
 }
 
 function GetSwapInfo() {
-	var swapinfo = si.mem(function(data) {
-		return data
+	si.mem(function(data) {
+		swapinfo.swapinfo = data
 	})
 }
 
 function GetUptime() {
-	return secondsToString(os.uptime())
+	uptime = secondsToString(os.uptime())
 }
 
 function ListHostapdClients() {
-//still thinking about this, should it be fixed for wlan0 or should it be flexible?
+	//still thinking about this, should it be fixed for wlan0 or should it be flexible?
 }
 
 function RebootSystem() {
@@ -221,14 +222,12 @@ io.on('connection', function(socket, next) {
 	log.info(socket.handshake.address + " has connected.") //is this needed? should we log to a file?
 
 
-	socket.on('system-info', function() {
-		var sysinfo = {
-			uptime: GetUptime(),
-			raminfo: GetRAMInfo(),
-			swalinfo: GetSwapInfo(),
-			cpuinfo: GetCPUInfo(),
-			fsspace: GetFsInfo()
-		}
+	socket.on('system info', function() {
+		socket.emit('system info results', sysinfo)
+	})
+	socket.on('interfaces list', function() {
+		GetInterfaceInfo()
+			socket.emit('interfaces result', interfaces)
 	})
 
 	socket.on('disconnect', function() {
