@@ -19,14 +19,7 @@
 	var socket = io.connect()
 	
 	function DisplayInterfaces(iface_array){
-		for (var i = 0; i < iface_array.length; i++){
-			var address = iface_array[i].address
-			var isinternal = iface_array[i].internal
-			var mac = iface_array[i].mac
-			var family = iface_array[i].family
-			var netmask = iface_array[i].netmask //is this even needed?
-			var scopeid = iface_array[i].scopeid //same here, is this needed?
-		}
+		console.log(iface_array)
 	}
 	function DisplayRAMData(data){
 		var freemem = data.freemem / 1073741824
@@ -60,11 +53,11 @@
 	}
 	
 	socket.on('interfaces result', function(data){
-		Object.keys(data).forEach(function(key) {
-    var iface = key
-		var info = data[key]
-		DisplayInterfaces(info)
-		});
+		if (data == null){
+			socket.emit('list interfaces')
+		} else {
+		DisplayInterfaces(data)
+		}
 	})
 	
 	/*

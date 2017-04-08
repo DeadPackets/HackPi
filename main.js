@@ -10,7 +10,6 @@ TODO:
 - Add Bluetooth scanning + jacking
 - Add Interface Bridging
 - Login to Web Console
-- System Info
 - Reboot functions
 - Shutdown (kill all processes related to HackPi and close main NodeJS) //Needs work
 - Hostapd clients connected
@@ -20,7 +19,6 @@ TODO:
 
 /*
 In Progress:
-- Interface info
 */
 
 var os = require('os');
@@ -44,23 +42,26 @@ var options = {
 //Wireless tools
 var hostapd = require('wireless-tools/hostapd');
 var ifconfig = require('wireless-tools/ifconfig');
+var iwconfig = require('wireless-tools/iwconfig')
 var iwlist = require('wireless-tools/iwlist');
 var iw = require('wireless-tools/iw');
 var udhcpc = require('wireless-tools/udhcpc');
+var wpa_supplicant = require('wireless-tools/wpa_supplicant');
 
 
 //Global variables
 var interfaces;
 var uptime;
+var ifaces = [];
 var cpuinfo = {}
 var raminfo = {}
 var fsinfo = {}
 var swapinfo = {}
 var sysinfo = {}
-/*
-	const mysql = require('mysql');
-	var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
-	*/
+	/*
+		const mysql = require('mysql');
+		var sql = mysql.createConnection({host: 'localhost', user: 'root', password: 'mypass', database: 'mydb'});
+		*/
 
 //Logging functions
 var log = {
@@ -82,21 +83,21 @@ var log = {
 }
 
 setInterval(function() {
-		GetCPUInfo()
-		GetFsInfo()
-		GetRAMInfo()
-		GetSwapInfo()
-		GetUptime()
-		sysinfo = {
-			cpuinfo: cpuinfo,
-			raminfo: raminfo,
-			fsinfo: fsinfo,
-			swapinfo: swapinfo,
-			uptime: uptime
-		}
-	}, 1000)
+	GetCPUInfo()
+	GetFsInfo()
+	GetRAMInfo()
+	GetSwapInfo()
+	GetUptime()
+	sysinfo = {
+		cpuinfo: cpuinfo,
+		raminfo: raminfo,
+		fsinfo: fsinfo,
+		swapinfo: swapinfo,
+		uptime: uptime
+	}
+}, 1000)
 
-	//Functions
+//Functions
 function secondsToString(seconds) {
 	var numdays = Math.floor(seconds / 86400);
 	var numhours = Math.floor((seconds % 86400) / 3600);
@@ -132,8 +133,18 @@ function GetFsInfo() {
 }
 
 function GetInterfaceInfo() {
-	interfaces = os.networkInterfaces()
+	ifconfig.status(function(err, status) {
+		interfaces = status
+		for (var i = 0; i < status.length; i++) {
+			iwconfig.status(status[i].interface, function(err, iface) {
+				if (iface) {
+					//do wireless code here
+				}
+			});
+		}
+	})
 }
+GetInterfaceInfo()
 
 function BringIfaceDown(callback) {
 	//todo
@@ -227,7 +238,7 @@ io.on('connection', function(socket, next) {
 	})
 	socket.on('interfaces list', function() {
 		GetInterfaceInfo()
-			socket.emit('interfaces result', interfaces)
+		socket.emit('interfaces result', interfaces)
 	})
 
 	socket.on('disconnect', function() {
