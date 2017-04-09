@@ -29,6 +29,7 @@ build/Release
 # Dependency directories
 node_modules
 jspm_packages
+server/node_modules
 
 # Optional npm cache directory
 .npm
@@ -37,10 +38,10 @@ jspm_packages
 .node_repl_history
 
 # SSL certificates
-ssl/*
+server/ssl/*
 
 # Ignore files inside the tools folder - let the client pull them
-tools/*
+server/tools/*
 
 # Ignore config file
-config/*
+server/config/*
