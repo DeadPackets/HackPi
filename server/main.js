@@ -14,7 +14,8 @@ var options = {
 
 import {
 	Log,
-	ScanLocal
+	ScanLocal,
+	ScanTarget
 } from './functions/fn';
 
 var SYSINFO = {
@@ -50,8 +51,12 @@ io.on('connection', (socket) => {
 		callback(SYSINFO)
 	})
 	
-	socket.on('scan local', function(iface, cb, cb2){
-		ScanLocal(iface, cb, cb2)
+	socket.on('scan local', (iface, cb) => {
+		ScanLocal(iface, cb)
+	})
+	
+	socket.on('scan target', (iface, target, cb) => {
+		ScanTarget(iface, target, cb)
 	})
 
 })

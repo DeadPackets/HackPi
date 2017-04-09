@@ -4,17 +4,21 @@ import si from 'systeminformation';
 import os from 'os';
 import ifconfig from 'wireless-tools/ifconfig'
 import SYSINFO from '../main';
-import { exec } from 'child_process';
+import {
+	exec,
+	spawn
+} from 'child_process';
 import nmap from 'node-nmap';
+import xml2js from 'xml2js';
 
-setInterval(()=>{
+setInterval(() => {
 	//i should probably change this, eeh, later
 	//Shouldnt we call them in order? Why nested?
-	UpdateCPUInfo(()=>{
-		UpdateFSInfo(()=>{
-			UpdateRAMInfo(()=>{
-				UpdateInterfaceInfo(()=>{
-					UpdateSwapInfo(()=>{
+	UpdateCPUInfo(() => {
+		UpdateFSInfo(() => {
+			UpdateRAMInfo(() => {
+				UpdateInterfaceInfo(() => {
+					UpdateSwapInfo(() => {
 						UpdateUptime()
 					})
 				})
@@ -35,7 +39,11 @@ export const UpdateCPUInfo = (cb) => {
 	si.cpuCurrentspeed(function(speed) {
 		si.cpuTemperature(function(temp) {
 			si.currentLoad(function(load) {
-				SYSINFO.cpu = { speed, temp, load }
+				SYSINFO.cpu = {
+					speed,
+					temp,
+					load
+				}
 				cb()
 			})
 		})
@@ -44,9 +52,13 @@ export const UpdateCPUInfo = (cb) => {
 
 export const UpdateFSInfo = (cb) => {
 	var fssize = si.fsSize(function(fssize) {
-		var ioinfo = si.disksIO(function(ioinfo){
-			var rwinfo = si.fsStats(function(rwinfo){
-				SYSINFO.fs = { fssize, ioinfo, rwinfo }
+		var ioinfo = si.disksIO(function(ioinfo) {
+			var rwinfo = si.fsStats(function(rwinfo) {
+				SYSINFO.fs = {
+					fssize,
+					ioinfo,
+					rwinfo
+				}
 				cb() //Im considering removing the ioinfo and rwinfo vars
 			})
 		})
@@ -54,9 +66,9 @@ export const UpdateFSInfo = (cb) => {
 }
 
 export const UpdateInterfaceInfo = (cb) => {
-	ifconfig.status((error, interfaces)=>{
-			SYSINFO.interfaces = interfaces
-			cb()
+	ifconfig.status((error, interfaces) => {
+		SYSINFO.interfaces = interfaces
+		cb()
 	})
 }
 
@@ -78,8 +90,8 @@ export const UpdateSwapInfo = (cb) => {
 }
 
 export const UpdateUptime = () => {
-	 SYSINFO.osuptime = secondsToString(os.uptime())
-	 SYSINFO.uptime = secondsToString(process.uptime())
+	SYSINFO.osuptime = secondsToString(os.uptime())
+	SYSINFO.uptime = secondsToString(process.uptime())
 }
 
 export const Reboot = () => {
@@ -90,10 +102,36 @@ export const Shutdown = () => {
 	exec('shutdown -P now')
 }
 
+export const ScanTargetPort = (iface, target, port, cb) => {
+	//scan target for certain ports (cuz why not?)
+}
+export const ScanNetworkPort = (iface, port, cb) => {
+	//scan entire local network for port or array of ports
+}
+
+export const ScanTarget = (iface, target, cb) => {
+	var parser = new xml2js.Parser();
+	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml ' + target)
+	console.log("Scan started!")
+
+	scan.on('exit', () => {
+		fs.readFile('/root/'+target+'.xml', function(err, data) {
+			if (err)
+				console.log(err)
+			parser.parseString(data, function(err, result) {
+				if (err)
+					console.log(err)
+				cb(result)
+				console.log('Done');
+			});
+		});
+	})
+}
 export const ScanLocal = (iface, cb) => {
-	
-	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T5', '-n', '--max-retries 0');
+	//we should auto calculate the local network of a given interface.
+	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-i ' + iface);
 	console.log("Created new scan")
+		//Add to interface status array that this iface is now busy with a ping sweep.
 	nmapscan.on('complete', (data) => {
 		cb(data, nmapscan.scanTime)
 	})

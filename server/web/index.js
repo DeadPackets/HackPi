@@ -89,10 +89,7 @@
           }
         });
       })
-      network.stabilize(10)
-
-
-
+      network.stabilize()
     })
 
 
