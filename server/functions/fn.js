@@ -111,7 +111,7 @@ export const ScanNetworkPort = (iface, port, cb) => {
 
 export const ScanTarget = (iface, target, cb) => {
 	var parser = new xml2js.Parser();
-	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml ' + target)
+	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml -i ' + iface + ' ' + target)
 	console.log("Scan started!")
 
 	scan.on('exit', () => {
@@ -125,6 +125,7 @@ export const ScanTarget = (iface, target, cb) => {
 				console.log('Done');
 			});
 		});
+		//Reminder to add delete function here
 	})
 }
 export const ScanLocal = (iface, cb) => {

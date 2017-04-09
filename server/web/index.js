@@ -37,12 +37,14 @@
 
 
     socket.emit('scan local', 'eth0', function(data, scantime) {
-      console.log(data, scantime)
+      console.log(data, scantime) //REMOVE THIS LATER
+      
       var hosts = [{
         id: 1,
         label: 'You',
         title: "You"
       }];
+      
       for (var i = 0; i < data.length; i++) {
         var obj = {
           id: data[i].ip,
@@ -75,12 +77,15 @@
         edges: edges
       };
       var network = new vis.Network(container, result, options);
+      
+      //Zooms in on central node
       network.once("beforeDrawing", function() {
         network.focus(1, {
           scale: 12
         });
       });
-
+      
+      //Zooms out with an animation
       network.once("afterDrawing", function() {
         network.fit({
           animation: {
@@ -89,6 +94,7 @@
           }
         });
       })
+      //Stops the wiggling
       network.stabilize()
     })
 
