@@ -1,16 +1,11 @@
 import colors from 'colors';
 import fs from 'fs';
 import si from 'systeminformation';
-import { exec } from 'child_process';
-import hostapd from 'wireless-tools/hostapd';
-import ifconfig from 'wireless-tools/ifconfig';
-import iwconfig from 'wireless-tools/iwconfig';
-import iwlist from 'wireless-tools/iwlist';
-import iw from 'wireless-tools/iw';
-import udhcpc from 'wireless-tools/udhcpc';
 import os from 'os';
-
+import ifconfig from 'wireless-tools/ifconfig'
 import SYSINFO from '../main';
+import { exec } from 'child_process';
+import nmap from 'node-nmap';
 
 setInterval(()=>{
 	//i should probably change this, eeh, later
@@ -93,6 +88,17 @@ export const Reboot = () => {
 
 export const Shutdown = () => {
 	exec('shutdown -P now')
+}
+
+export const ScanLocal = (iface, cb) => {
+	
+	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T5', '-n', '--max-retries 0');
+	console.log("Created new scan")
+	nmapscan.on('complete', (data) => {
+		cb(data, nmapscan.scanTime)
+	})
+	nmapscan.startScan()
+	
 }
 
 export const Log = {

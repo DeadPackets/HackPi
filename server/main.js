@@ -13,7 +13,8 @@ var options = {
 
 
 import {
-	Log
+	Log,
+	ScanLocal
 } from './functions/fn';
 
 var SYSINFO = {
@@ -47,6 +48,10 @@ io.on('connection', (socket) => {
 
 	socket.on('get system info', (callback) => {
 		callback(SYSINFO)
+	})
+	
+	socket.on('scan local', function(iface, cb, cb2){
+		ScanLocal(iface, cb, cb2)
 	})
 
 })
