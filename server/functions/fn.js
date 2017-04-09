@@ -98,7 +98,6 @@ export const ScanLocal = (iface, cb) => {
 		cb(data, nmapscan.scanTime)
 	})
 	nmapscan.startScan()
-	
 }
 
 export const Log = {
