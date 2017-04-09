@@ -1,6 +1,16 @@
 require("babel-core").transform("code");
 
 import IO from 'socket.io';
+import express from 'express';
+import https from 'https';
+var app = express()
+var port = 443
+import fs from 'fs';
+var options = {
+	key: fs.readFileSync(__dirname + '/ssl/server.key'),
+	cert: fs.readFileSync(__dirname + '/ssl/server.cert')
+};
+
 
 import {
 	Log
@@ -15,7 +25,23 @@ var SYSINFO = {
 }
 export default SYSINFO;
 
-const io = IO(8080);
+//HTTP SERVER INIT
+var server = https.createServer(options, app).listen(port, () => {
+	Log.i("Express server listening on port " + port);
+});
+
+//STATIC WEB
+app.use(express.static(__dirname + '/web'));
+
+//SOCKET.IO INIT
+const io = IO(server);
+
+//HTTP GET RULES
+app.get('/', (req, res) => {
+	Log.d(req.connection.remoteAddress + " GET /")
+	res.sendFile(__dirname + '/web/index.html');
+});
+
 
 io.on('connection', (socket) => {
 

@@ -14,6 +14,7 @@ import SYSINFO from '../main';
 
 setInterval(()=>{
 	//i should probably change this, eeh, later
+	//Shouldnt we call them in order? Why nested?
 	UpdateCPUInfo(()=>{
 		UpdateFSInfo(()=>{
 			UpdateRAMInfo(()=>{
@@ -26,6 +27,14 @@ setInterval(()=>{
 		})
 	})
 }, 1000)
+
+export const secondsToString = (seconds) => {
+	var numdays = Math.floor(seconds / 86400);
+	var numhours = Math.floor((seconds % 86400) / 3600);
+	var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
+	var numseconds = ((seconds % 86400) % 3600) % 60;
+	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
+}
 
 export const UpdateCPUInfo = (cb) => {
 	si.cpuCurrentspeed(function(speed) {
@@ -43,7 +52,7 @@ export const UpdateFSInfo = (cb) => {
 		var ioinfo = si.disksIO(function(ioinfo){
 			var rwinfo = si.fsStats(function(rwinfo){
 				SYSINFO.fs = { fssize, ioinfo, rwinfo }
-				cb()
+				cb() //Im considering removing the ioinfo and rwinfo vars
 			})
 		})
 	})
@@ -51,10 +60,8 @@ export const UpdateFSInfo = (cb) => {
 
 export const UpdateInterfaceInfo = (cb) => {
 	ifconfig.status((error, interfaces)=>{
-		interfaces.every((i)=>{
-			SYSINFO.interfaces[i.interface] = i;
+			SYSINFO.interfaces = interfaces
 			cb()
-		})
 	})
 }
 
@@ -76,8 +83,8 @@ export const UpdateSwapInfo = (cb) => {
 }
 
 export const UpdateUptime = () => {
-	 SYSINFO.osuptime = os.uptime()
-	 SYSINFO.uptime = process.uptime()
+	 SYSINFO.osuptime = secondsToString(os.uptime())
+	 SYSINFO.uptime = secondsToString(process.uptime())
 }
 
 export const Reboot = () => {
