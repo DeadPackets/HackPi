@@ -39,6 +39,7 @@ server/node_modules
 
 # SSL certificates
 server/ssl/*
+ssl/*
 
 # Ignore files inside the tools folder - let the client pull them
 server/tools/*
