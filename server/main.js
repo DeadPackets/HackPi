@@ -11,6 +11,55 @@ var options = {
 	cert: fs.readFileSync(__dirname + '/ssl/server.cert')
 };
 
+/*
+
+EXAMPLE OF GLOBAL TRACKING OBJECT
+---------------------------------
+
+var obj = {
+	interface: 'wlan0',
+	mac: 'mac of card',
+	type: 'wireless',
+	status: {
+		busy: false,
+		process: null //due to busy being false
+	},
+	isup: true, //interface is up
+	connected: false //not connected to wifi, not neccessarily busy yknow?
+}
+
+var ob2 = {
+	interface: 'wlan1',
+	type: 'wireless',
+	status: {
+		busy: true,
+		process: {
+			type: 'WIFI_DOS', ///could be anything, MiTM, MASS_JAM, WPS_ATTACK, SCANNING and so on
+			bssid: 'mac address of attacked wifi point',
+			essid: 'ssid of attacked wifi point'
+		}
+	},
+	isup: true,
+	connected: false //not connected
+}
+
+var obj3 = {
+	interface: 'wlan2',
+	type: 'wireless',
+	status: {
+		busy: false,
+		process: null
+	},
+	isup: true,
+	connected: {
+		bssid: 'mac of connected access point',
+		essid: 'name of connected access point',
+		ip: 'ip of interface related to that access point (private ip)',
+		router: 'ip of router/gateway'
+	}
+}
+
+*/
 
 import {
 	Log,
@@ -50,11 +99,11 @@ io.on('connection', (socket) => {
 	socket.on('get system info', (callback) => {
 		callback(SYSINFO)
 	})
-	
+
 	socket.on('scan local', (iface, cb) => {
 		ScanLocal(iface, cb)
 	})
-	
+
 	socket.on('scan target', (iface, target, cb) => {
 		ScanTarget(iface, target, cb)
 	})

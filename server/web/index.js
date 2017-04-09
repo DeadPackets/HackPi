@@ -70,11 +70,11 @@
       var container = document.getElementById('mynetwork');
 
       // provide the data in the vis format
-      var data = {
+      var result = {
         nodes: nodes,
         edges: edges
       };
-      var network = new vis.Network(container, data, options);
+      var network = new vis.Network(container, result, options);
       network.once("beforeDrawing", function() {
         network.focus(1, {
           scale: 12
