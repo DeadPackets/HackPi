@@ -16,7 +16,7 @@ const SERVER_CONFIG = {
 
 const socket = io.connect(SERVER_CONFIG.HOST, { secure: true, jsonp: false, reconnectionDelay: 5000 })
 
-export default class oo extends Component {
+export default class HackPi extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -30,4 +30,4 @@ export default class oo extends Component {
   }
 }
 
-AppRegistry.registerComponent('oo', () => oo);
+AppRegistry.registerComponent('HackPi', () => HackPi);
