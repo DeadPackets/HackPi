@@ -67,6 +67,10 @@ import {
 	ScanTarget
 } from './functions/fn';
 
+import {
+	ScanWifi
+} from './functions/wifi';
+
 var SYSINFO = {
 	cpu: {},
 	mem: {},
@@ -106,6 +110,10 @@ io.on('connection', (socket) => {
 
 	socket.on('scan target', (iface, target, cb) => {
 		ScanTarget(iface, target, cb)
+	})
+
+	socket.on('scan wifi', (iface, cb) => {
+		ScanWifi(iface, cb)
 	})
 
 })

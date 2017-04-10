@@ -5,19 +5,19 @@ import iwlist from 'wireless-tools/iwlist';
 import iw from 'wireless-tools/iw';
 import udhcpc from 'wireless-tools/udhcpc';
 
-export const CheckIfaceState = (interface, cb) => {
+export const CheckIfaceState = (iface, cb) => {
   //needs to check if interface is up and so on
-  iwconfig.status(interface, (err, status) => {
+  iwconfig.status(iface, (err, status) => {
     if (err)
       cb('fail', err)
     cb('success', status)
   });
 }
 
-export const ScanWifi = (interface, cb) => {
+export const ScanWifi = (iface, cb) => {
   //wireless check + scan here
   iwlist.scan({
-    iface: interface,
+    iface: iface,
     show_hidden: true
   }, function(err, networks) {
     if (err)
