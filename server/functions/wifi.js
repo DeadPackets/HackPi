@@ -22,7 +22,7 @@ export const ScanWifi = (iface, cb) => {
   }, function(err, networks) {
     if (err)
       cb('fail', err)
-    cb('sucecss', networks);
+    cb('success', networks);
   });
 }
 
