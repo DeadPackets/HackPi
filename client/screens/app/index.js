@@ -39,6 +39,12 @@ export default class App extends Component {
           unit: 'B',
           data: [400000, 432981, 1000000, 23000000, 23617281, 24617283, 25726183, 24736183, 26738476, 28172635],
           type: 'line'
+        },
+        battery: {
+          title: 'Battery Level',
+          unit: '%',
+          data: [45],
+          type: 'bar'
         }
       }
     }
