@@ -4,7 +4,7 @@ import IO from 'socket.io';
 import express from 'express';
 import https from 'https';
 var app = express()
-var port = 443
+var port = 443 //change this to 1337 once dev is done (its 443 because I dev at school) (Should we turn this into a config controlled port?)
 import fs from 'fs';
 var options = {
 	key: fs.readFileSync(__dirname + '/ssl/server.key'),
