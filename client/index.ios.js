@@ -11,7 +11,7 @@ import App from './screens/app';
 import SocketLoader from './screens/socketLoader';
 
 const SERVER_CONFIG = {
-  HOST: '10.196.80.171:8080'
+  HOST: '10.196.80.171:8080' //this should be dynamic, or fixed to the HackPi's default IP, aka 192.168.69.1 and the port is 443 FOR NOW
 }
 
 const socket = io.connect(SERVER_CONFIG.HOST, { secure: true, jsonp: false, reconnectionDelay: 5000 })
