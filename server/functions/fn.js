@@ -115,13 +115,13 @@ export const ScanTarget = (iface, target, cb) => {
 	console.log("Scan started!")
 
 	scan.on('exit', () => {
-		fs.readFile('/root/'+target+'.xml', function(err, data) {
+		fs.readFile('/root/' + target + '.xml', function(err, data) {
 			if (err)
-				console.log(err)
+				cb('fail', err)
 			parser.parseString(data, function(err, result) {
 				if (err)
-					console.log(err)
-				cb(result)
+					cb('fail', err)
+				cb('success', result)
 				console.log('Done');
 			});
 		});
@@ -132,9 +132,13 @@ export const ScanLocal = (iface, cb) => {
 	//we should auto calculate the local network of a given interface.
 	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-i ' + iface);
 	console.log("Created new scan")
-		//Add to interface status array that this iface is now busy with a ping sweep.
+	
+	nmapscan.on('error', function(error) {
+		cb('fail', error)
+	});
+	//Add to interface status array that this iface is now busy with a ping sweep.
 	nmapscan.on('complete', (data) => {
-		cb(data, nmapscan.scanTime)
+		cb('success', data, nmapscan.scanTime)
 	})
 	nmapscan.startScan()
 }

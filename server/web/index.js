@@ -36,75 +36,71 @@
     // initialize your network!
 
 
-    socket.emit('scan local', 'eth0', function(data, scantime) {
-      console.log(data, scantime) //REMOVE THIS LATER
-      
-      var hosts = [{
-        id: 1,
-        label: 'You',
-        title: "You"
-      }];
-      
-      for (var i = 0; i < data.length; i++) {
-        var obj = {
-          id: data[i].ip,
-          label: data[i].ip,
-          title: data[i].hostname
-        }
-        hosts.push(obj)
-      }
-      var nodes = new vis.DataSet(hosts);
+    socket.emit('scan local', 'eth0', function(state, data, scantime) {
+      if (state == 'success') {
+        console.log(data, scantime) //REMOVE THIS LATER
 
-      // create an array with edges
-      var edges_data = [];
-      for (var i = 0; i < hosts.length; i++) {
-        if (hosts[i].id == 1) {} else {
+        var hosts = [{
+          id: 1,
+          label: 'You',
+          title: "You"
+        }];
+
+        for (var i = 0; i < data.length; i++) {
           var obj = {
-            from: hosts[i].id,
-            to: 1
+            id: data[i].ip,
+            label: data[i].ip,
+            title: data[i].hostname
           }
-          edges_data.push(obj)
+          hosts.push(obj)
         }
-      }
-      var edges = new vis.DataSet(edges_data);
+        var nodes = new vis.DataSet(hosts);
 
-      // create a network
-      var container = document.getElementById('mynetwork');
-
-      // provide the data in the vis format
-      var result = {
-        nodes: nodes,
-        edges: edges
-      };
-      var network = new vis.Network(container, result, options);
-      
-      //Zooms in on central node
-      network.once("beforeDrawing", function() {
-        network.focus(1, {
-          scale: 12
-        });
-      });
-      
-      //Zooms out with an animation
-      network.once("afterDrawing", function() {
-        network.fit({
-          animation: {
-            duration: 3000,
-            easingFunction: 'easeInOutQuint'
+        // create an array with edges
+        var edges_data = [];
+        for (var i = 0; i < hosts.length; i++) {
+          if (hosts[i].id == 1) {} else {
+            var obj = {
+              from: hosts[i].id,
+              to: 1
+            }
+            edges_data.push(obj)
           }
+        }
+        var edges = new vis.DataSet(edges_data);
+
+        // create a network
+        var container = document.getElementById('mynetwork');
+
+        // provide the data in the vis format
+        var result = {
+          nodes: nodes,
+          edges: edges
+        };
+        var network = new vis.Network(container, result, options);
+
+        //Zooms in on central node
+        network.once("beforeDrawing", function() {
+          network.focus(1, {
+            scale: 12
+          });
         });
-      })
-      //Stops the wiggling
-      network.stabilize()
+
+        //Zooms out with an animation
+        network.once("afterDrawing", function() {
+            network.fit({
+              animation: {
+                duration: 3000,
+                easingFunction: 'easeInOutQuint'
+              }
+            });
+          })
+          //Stops the wiggling
+        network.stabilize()
+      } else {
+        console.log("Error!", data)
+      }
     })
-
-
-
-
-
-
-
-
 
 
     socket.emit('get system info', function(data) {
