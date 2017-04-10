@@ -46,3 +46,4 @@ server/tools/*
 
 # Ignore config file
 server/config/*
+config/*
