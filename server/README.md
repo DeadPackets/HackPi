@@ -10,17 +10,16 @@ HackPi is a NodeJS project to turn a raspberry pi running kali into a fully port
 - Realtime updates using Socket.io
 - Online terminal with https (auto starts on boot)
 - Ad-hoc style access point for connectivity that starts on boot
-- System stats
-- Map out surrounding network in a network graph
+- System stats 
 
 
 ### Todo
 ---
 - Update the Features (xD)
 - Work on at least inital client side
-- Client side system information (Done, just needs to be inserted into client)
-- Listing available network interfaces (WIP)
-- Listing available WiFi points (90% done)
+- Client side system information
+- Listing available network interfaces
+- Listing available WiFi points
 - Running WPSPixie against WiFi points
 - Mass WiFi Jamming
 - Ability to track down running processes (If I run a mass wifi jamming attack, I want to be able to stop it even if I refresh the page)
