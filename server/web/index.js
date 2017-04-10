@@ -33,6 +33,14 @@
       }
       // create an array with nodes
 
+    //Global vars
+    var hosts;
+    var nodes;
+    var edges;
+    var container;
+    var network;
+
+
     // initialize your network!
 
 
@@ -40,7 +48,7 @@
       if (state == 'success') {
         console.log(data, scantime) //REMOVE THIS LATER
 
-        var hosts = [{
+        hosts = [{
           id: 1,
           label: 'You',
           title: "You"
@@ -54,7 +62,7 @@
           }
           hosts.push(obj)
         }
-        var nodes = new vis.DataSet(hosts);
+        nodes = new vis.DataSet(hosts);
 
         // create an array with edges
         var edges_data = [];
@@ -67,17 +75,17 @@
             edges_data.push(obj)
           }
         }
-        var edges = new vis.DataSet(edges_data);
+        edges = new vis.DataSet(edges_data);
 
         // create a network
-        var container = document.getElementById('mynetwork');
+        container = document.getElementById('mynetwork');
 
         // provide the data in the vis format
-        var result = {
+        result = {
           nodes: nodes,
           edges: edges
         };
-        var network = new vis.Network(container, result, options);
+        network = new vis.Network(container, result, options);
 
         //Zooms in on central node
         network.once("beforeDrawing", function() {

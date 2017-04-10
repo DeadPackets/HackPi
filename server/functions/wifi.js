@@ -7,7 +7,7 @@ import udhcpc from 'wireless-tools/udhcpc';
 
 export const CheckIfaceState = (interface, cb) => {
   //needs to check if interface is up and so on
-  iwconfig.status(interface, function(err, status) {
+  iwconfig.status(interface, (err, status) => {
     if (err)
       cb('fail', err)
     cb('success', status)
@@ -28,7 +28,7 @@ export const ScanWifi = (interface, cb) => {
 
 export const DisconnectWifi = (iface, cb) => {
   //simply turn interface off or actully disconnect
-  wpa_supplicant.disable(iface, function(err) {
+  wpa_supplicant.disable(iface, (err) => {
     if (err)
       cb('fail', err)
     cb("success")
@@ -62,7 +62,7 @@ export const ConnectToWifi = (iface, wifi, cb) => {
         passphrase: wifi.security.passphrase,
         driver: 'wext'
       };
-      wpa_supplicant.enable(options, function(err) {
+      wpa_supplicant.enable(options, (err) => {
         if (err)
           cb('fail', err)
         cb('success')

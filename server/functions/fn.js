@@ -111,14 +111,17 @@ export const ScanNetworkPort = (iface, port, cb) => {
 
 export const ScanTarget = (iface, target, cb) => {
 	var parser = new xml2js.Parser();
-	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml -i ' + iface + ' ' + target)
+	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml -e ' + iface + ' ' + target)
 	console.log("Scan started!")
+	scan.stderr.on('data', (data) => {
+		cb('fail', data)
+	});
 
 	scan.on('exit', () => {
-		fs.readFile('/root/' + target + '.xml', function(err, data) {
+		fs.readFile('/root/' + target + '.xml', (err, data) => {
 			if (err)
 				cb('fail', err)
-			parser.parseString(data, function(err, result) {
+			parser.parseString(data, (err, result) => {
 				if (err)
 					cb('fail', err)
 				cb('success', result)
@@ -130,10 +133,10 @@ export const ScanTarget = (iface, target, cb) => {
 }
 export const ScanLocal = (iface, cb) => {
 	//we should auto calculate the local network of a given interface.
-	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-i ' + iface);
+	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-e ' + iface);
 	console.log("Created new scan")
-	
-	nmapscan.on('error', function(error) {
+
+	nmapscan.on('error', (error) => {
 		cb('fail', error)
 	});
 	//Add to interface status array that this iface is now busy with a ping sweep.
