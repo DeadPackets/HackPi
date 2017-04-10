@@ -3,17 +3,44 @@ import {
   View,
   Text,
   StyleSheet,
-  TabBarIOS
+  TabBarIOS,
+  ScrollView
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import StatusScreen from '../statusScreen';
+import StatusCard from '../statusCard';
 
 export default class App extends Component {
   constructor() {
     super()
     this.state = {
-      currentTab: 'status'
+      currentTab: 'status',
+      status: {
+        temp: {
+          title: 'Temperature',
+          unit: 'deg',
+          data: [9,10,10,12,10,12,13,12,13,15,16,18,22,23,24,26,29],
+          type: 'line'
+        },
+        memory: {
+          title: 'Memory Usage',
+          unit: 'B',
+          data: [2400, 4500, 450000, 456000, 500123, 612123, 522172, 988122],
+          type: 'line'
+        },
+        cpu: {
+          title: 'CPU Usage',
+          unit: '%',
+          data: [70, 23, 52, 91],
+          type: 'bar'
+        },
+        network: {
+          title: 'Network Activity',
+          unit: 'B',
+          data: [400000, 432981, 1000000, 23000000, 23617281, 24617283, 25726183, 24736183, 26738476, 28172635],
+          type: 'line'
+        }
+      }
     }
   }
   componentDidMount() {
@@ -21,35 +48,51 @@ export default class App extends Component {
     socket.emit('get status', (data)=>{
       if(data && typeof data === 'object') {
         this.setState({
-          status: data
+          status: {
+            temp: {
+              ...this.state.temp,
+              data: data.temperatureArray
+            },
+            memory: {
+              ...this.state.memory,
+              data: data.memoryUsageArray
+            }
+          }
         })
       }
     })
   }
   render() {
+    var keys = Object.keys(this.state.status).map((i)=>{
+      console.log(Object.keys(this.state.status), i)
+      return <StatusCard status={this.state.status[i]} key={i} />
+    })
     return (
       <View style={[styles.container, (this.props.socket.connected==false ? null : {display: 'none'})]}>
         <TabBarIOS
-          barTintColor={"#334336"}
-          tintColor={"#161D17"}>
+          barTintColor={"#063964"}
+          tintColor={"#01223E"}
+          unselectedItemTintColor={"#17619F"}>
           <Icon.TabBarItemIOS
-            iconName={'ios-time-outline'}
-            selectedIconName={'ios-time'}
+            iconName={'ios-pie-outline'}
+            selectedIconName={'ios-pie'}
             title={"Status"}
             selected={this.state.currentTab === 'status'}
             onPress={()=>{ this.setState({ currentTab: 'status' }) }}>
 
             <View style={styles.tab}>
-              <StatusScreen status={this.state.status} />
+              <ScrollView>
+                {keys}
+              </ScrollView>
             </View>
 
           </Icon.TabBarItemIOS>
           <Icon.TabBarItemIOS
-            iconName={'ios-cloud-upload-outline'}
-            selectedIconName={'ios-cloud-upload'}
-            title={"Functions"}
-            selected={this.state.currentTab === 'func'}
-            onPress={()=>{ this.setState({ currentTab: 'func' }) }}>
+            iconName={'ios-git-network'}
+            selectedIconName={'ios-git-network'}
+            title={"Node Map"}
+            selected={this.state.currentTab === 'node map'}
+            onPress={()=>{ this.setState({ currentTab: 'node map' }) }}>
             <Text style={styles.text}>Tab Two</Text>
           </Icon.TabBarItemIOS>
           <Icon.TabBarItemIOS
@@ -69,7 +112,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1D211D'
+    backgroundColor: '#00111F'
   },
   text: {
     color: '#4D6C47',
@@ -77,7 +120,6 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    marginTop: 40,
     alignItems: 'center'
   }
 })
