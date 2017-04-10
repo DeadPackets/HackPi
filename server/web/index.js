@@ -142,7 +142,7 @@
         var iface = data.interfaces[i]
         var mac = iface.address || false
         var ifacename = iface.interface
-        var ipv4addr = iface.ipv4_address
+        var ipv4addr = iface.ipv4_address || null
         var ipv6addr = iface.ipv6_address || null
         var isloopback = iface.loopback || false
         var isup = iface.up
@@ -150,5 +150,6 @@
         var type = iface.link
         var broadcast = iface.broadcast || false
         var multicast = iface.multicast || false
+        console.log(ifacename + " " + mac + " " + type)
       }
     })
