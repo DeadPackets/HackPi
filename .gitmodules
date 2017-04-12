@@ -4,3 +4,6 @@
 [submodule "server/tools/bluemaho"]
 	path = server/tools/bluemaho
 	url = https://github.com/zenware/bluemaho
+[submodule "server/tools/BT-Device-DOS"]
+	path = server/tools/BT-Device-DOS
+	url = https://github.com/DeadPackets/BT-Device-DOS/
