@@ -41,9 +41,6 @@ server/node_modules
 server/ssl/*
 ssl/*
 
-# Ignore files inside the tools folder - let the client pull them
-server/tools/*
-
 # Ignore config file
 server/config/*
 config/*
