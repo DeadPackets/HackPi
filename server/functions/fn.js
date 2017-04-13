@@ -41,11 +41,6 @@ export const UpdateInterfaceState = () => {
 		} else {
 			iface.link = 'monitor-mode'
 		}
-		if (iface.status) {
-			if (iface.status.busy == true) {
-
-			}
-		}
 		iface.status.busy = false
 		iface.status.process = 'none'
 		iface.connected = false
