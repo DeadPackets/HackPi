@@ -4,3 +4,6 @@
 [submodule "server/tools/BT-Device-DOS"]
 	path = server/tools/BT-Device-DOS
 	url = https://github.com/DeadPackets/BT-Device-DOS/
+[submodule "server/functions/node-wireless"]
+	path = server/functions/node-wireless
+	url = https://github.com/elijahparker/node-wireless/
