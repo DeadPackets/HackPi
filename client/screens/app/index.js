@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   TabBarIOS,
-  ScrollView
+  ScrollView,
+  WebView
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -19,62 +20,80 @@ export default class App extends Component {
         temp: {
           title: 'Temperature',
           unit: 'deg',
-          data: [9,10,10,12,10,12,13,12,13,15,16,18,22,23,24,26,29],
+          data: [],
           type: 'line'
         },
         memory: {
           title: 'Memory Usage',
-          unit: 'B',
-          data: [2400, 4500, 450000, 456000, 500123, 612123, 522172, 988122],
+          unit: '%',
+          data: [],
           type: 'line'
         },
         cpu: {
           title: 'CPU Usage',
           unit: '%',
-          data: [70, 23, 52, 91],
-          type: 'bar'
-        },
-        network: {
-          title: 'Network Activity',
-          unit: 'B',
-          data: [400000, 432981, 1000000, 23000000, 23617281, 24617283, 25726183, 24736183, 26738476, 28172635],
+          data: [],
           type: 'line'
-        },
-        battery: {
-          title: 'Battery Level',
-          unit: '%',
-          data: [45],
-          type: 'bar'
         }
       }
     }
+    this.getSystemUpdates = this.getSystemUpdates.bind(this)
   }
   componentDidMount() {
+    setInterval(this.getSystemUpdates, 500)
+  }
+  getSystemUpdates() {
     var socket = this.props.socket;
-    socket.emit('get status', (data)=>{
+    var that = this;
+    socket.emit('get system info', (data)=>{
       if(data && typeof data === 'object') {
-        this.setState({
+        that.setState({
           status: {
+            ...this.state.status,
             temp: {
-              ...this.state.temp,
-              data: data.temperatureArray
+              ...this.state.status.temp,
+              data: [...this.state.status.temp.data, data.cpu.temp.max]
             },
             memory: {
-              ...this.state.memory,
-              data: data.memoryUsageArray
+              ...this.state.status.memory,
+              data: [...this.state.status.memory.data, (data.mem.used / data.mem.total) * 100]
+            },
+            cpu: {
+              ...this.state.status.cpu,
+              data: [...this.state.status.cpu.data, data.cpu.load.currentload]
             }
+          }
+        })
+      }
+    })
+    Object.keys(this.state.status).every((i)=>{
+      if(this.state.status[i].data.length > 30) {
+        console.log(this.state.status[i].data.length)
+        var reverse=this.state.status[i].data.slice(0).reverse();
+        reverse.length = 30;
+        var complete = reverse.slice(0).reverse();
+        var newStatus = { 
+          ...this.state.status 
+        }
+        newStatus[i] = {
+          ...this.state.status[i],
+          data: complete
+        }
+        this.setState({
+          status: {
+            ...this.state.status,
+            ...newStatus
           }
         })
       }
     })
   }
   render() {
-    var keys = Object.keys(this.state.status).map((i)=>{
-      console.log(Object.keys(this.state.status), i)
+    var data = Object.keys(this.state.status).map((i)=>{
       return <StatusCard status={this.state.status[i]} key={i} />
     })
     return (
-      <View style={[styles.container, (this.props.socket.connected==false ? null : {display: 'none'})]}>
+      <View style={[styles.container, (this.props.connected ? null : {display: 'none'})]}>
         <TabBarIOS
           barTintColor={"#063964"}
           tintColor={"#01223E"}
@@ -87,8 +106,8 @@ export default class App extends Component {
             onPress={()=>{ this.setState({ currentTab: 'status' }) }}>
 
             <View style={styles.tab}>
-              <ScrollView>
-                {keys}
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {data}
               </ScrollView>
             </View>
 
@@ -99,7 +118,14 @@ export default class App extends Component {
             title={"Node Map"}
             selected={this.state.currentTab === 'node map'}
             onPress={()=>{ this.setState({ currentTab: 'node map' }) }}>
-            <Text style={styles.text}>Tab Two</Text>
+            <WebView 
+              source={{uri: "http://104.236.177.57:1337"}} 
+              scrollEnable={false} 
+              style={styles.web} 
+              onMessage={(e)=>{
+                console.log(JSON.parse(e.nativeEvent.data))
+              }}
+            />
           </Icon.TabBarItemIOS>
           <Icon.TabBarItemIOS
             iconName={'ios-settings-outline'}
@@ -127,5 +153,8 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     alignItems: 'center'
+  },
+  web: {
+    flex: 1
   }
 })
