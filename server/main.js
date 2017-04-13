@@ -72,8 +72,12 @@ import {
 	CheckIfaceState,
 	DisconnectWifi,
 	CheckAllIfaces,
-	ConnectToWifi
+	ConnectToWifi,
+	StartMainWifiIface,
+	StopMainWifiIface
 } from './functions/wifi';
+
+import wifi from './functions/wifi';
 
 var SYSINFO = {
 	cpu: {},
@@ -136,4 +140,15 @@ io.on('connection', (socket) => {
 		ConnectToWifi(iface, options, cb)
 	})
 
+	socket.on('disconnect wifi', (iface, cb) => {
+		DisconnectWifi(iface, cb)
+	})
+
+	socket.on('start wifi', (iface) => {
+		StartMainWifiIface(iface)
+	})
+
+	socket.on('stop wifi', (iface) => {
+		StopMainWifiIface(iface)
+	})
 })
