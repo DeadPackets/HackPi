@@ -47,7 +47,7 @@ export const CheckAllIfaces = (cb) => {
 				wirelessifaces.push(status)
 			})
 		}
-		var test = i++;
+		var test = i + 1;
 		if (test == SYSINFO.interfaces.length) {
 			console.log(wirelessifaces)
 			cb('success', wirelessifaces)
@@ -55,6 +55,7 @@ export const CheckAllIfaces = (cb) => {
 			console.log(i + " = " + SYSINFO.interfaces.length)
 		}
 	}
+	console.log(wirelessifaces)
 }
 
 export const WPSPixie = (iface, wifi, cb) => {
