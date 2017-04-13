@@ -140,14 +140,20 @@
     	//Parsing interface data
     	for (var i = 0; i < data.interfaces.length; i++) {
     		var iface = data.interfaces[i]
-    		var mac = iface.address || false
+    		var mac = iface.address || null
     		var ifacename = iface.interface
     		var ipv4addr = iface.ipv4_address || null
     		var ipv6addr = iface.ipv6_address || null
     		var isloopback = iface.loopback || false
     		var isup = iface.up
     		var isrunning = iface.running || false
-    		var type = iface.link
+    		if (iface.interface.indexOf('mon') < 0) {
+    			var type = iface.link
+    		} else if (iface.interface.indexOf('wlan') < 0) {
+    			var type = 'wireless'
+    		} else {
+    			var type = 'monitor-mode'
+    		}
     		var broadcast = iface.broadcast || false
     		var multicast = iface.multicast || false
     		console.log(ifacename + " " + mac + " " + type)

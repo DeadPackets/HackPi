@@ -68,7 +68,9 @@ import {
 } from './functions/fn';
 
 import {
-	ScanWifi
+	ScanWifi,
+	CheckIfaceState,
+	DisconnectWifi
 } from './functions/wifi';
 
 var SYSINFO = {
