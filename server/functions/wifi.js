@@ -4,6 +4,7 @@ import iwconfig from 'wireless-tools/iwconfig';
 import iwlist from 'wireless-tools/iwlist';
 import iw from 'wireless-tools/iw';
 import udhcpc from 'wireless-tools/udhcpc';
+import SYSINFO from '../main';
 
 export const CheckIfaceState = (iface, cb) => {
 	//needs to check if interface is up and so on
@@ -33,6 +34,18 @@ export const DisconnectWifi = (iface, cb) => {
 			cb('fail', err)
 		cb("success")
 	});
+}
+
+export const CheckAllIfaces = (cb) => {
+	for (var i = 0; i < SYSINFO.interface.length; i++)
+		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {} else {
+			console.log(SYSINFO.interfaces[i].interface)
+			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
+				if (err)
+					cb('fail', err)
+				cb('success', status)
+			})
+		}
 }
 
 export const WPSPixie = (iface, wifi, cb) => {

@@ -70,7 +70,8 @@ import {
 import {
 	ScanWifi,
 	CheckIfaceState,
-	DisconnectWifi
+	DisconnectWifi,
+	CheckAllIfaces
 } from './functions/wifi';
 
 var SYSINFO = {
@@ -120,6 +121,10 @@ io.on('connection', (socket) => {
 
 	socket.on('scan wifi', (iface, cb) => {
 		ScanWifi(iface, cb)
+	})
+
+	socket.on('list wireless', (cb) => {
+		CheckAllIfaces(cb)
 	})
 
 })
