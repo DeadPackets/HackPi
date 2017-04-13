@@ -9,7 +9,11 @@ import {
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import StatusCard from '../statusCard';
+import StatusCard from '../../components/statusCard';
+import {
+  SwitchSetting,
+  TextSetting
+} from '../../components/settingsCard';
 
 export default class App extends Component {
   constructor() {
@@ -40,7 +44,7 @@ export default class App extends Component {
     this.getSystemUpdates = this.getSystemUpdates.bind(this)
   }
   componentDidMount() {
-    setInterval(this.getSystemUpdates, 500)
+    setInterval(this.getSystemUpdates, 1000)
   }
   getSystemUpdates() {
     var socket = this.props.socket;
@@ -133,7 +137,16 @@ export default class App extends Component {
             title={"Settings"}
             selected={this.state.currentTab === 'settings'}
             onPress={()=>{ this.setState({ currentTab: 'settings' }) }}>
-            <Text style={styles.text}>Tab Three</Text>
+
+            <View style={styles.tab}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <SwitchSetting setting={{ title: 'A', value: false }} />
+                <SwitchSetting setting={{ title: 'Bunch', value: false }} />
+                <SwitchSetting setting={{ title: 'Of', value: false }} />
+                <TextSetting setting={{ title: 'Options', value: 'test' }} />
+              </ScrollView>
+            </View>
+
           </Icon.TabBarItemIOS>
         </TabBarIOS>
       </View>
@@ -151,6 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
   tab: {
+    marginTop: 10,
     flex: 1,
     alignItems: 'center'
   },
