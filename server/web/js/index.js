@@ -148,9 +148,9 @@
     		var isup = iface.up
     		var isrunning = iface.running || false
     		if (iface.interface.indexOf('wlan') < 0) {
-    			var type = 'wireless'
-    		} else if (iface.interface.indexOf('mon') < 0) {
     			var type = iface.link
+    		} else if (iface.interface.indexOf('mon') < 0) {
+    			var type = 'wireless'
     		} else {
     			var type = 'monitor-mode'
     		}
