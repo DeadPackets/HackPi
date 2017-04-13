@@ -47,8 +47,10 @@ export const CheckAllIfaces = (cb) => {
 				wirelessifaces.push(status)
 			})
 		}
+		if (i == SYSINFO.interfaces.length) {
+			cb('success', wirelessifaces)
+		}
 	}
-	cb('success', wirelessifaces)
 }
 
 export const WPSPixie = (iface, wifi, cb) => {
