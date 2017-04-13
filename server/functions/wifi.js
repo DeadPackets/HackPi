@@ -44,15 +44,10 @@ export const CheckAllIfaces = (cb) => {
 			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
 				if (err)
 					cb('fail', err)
+				console.log(status)
+				console.log(wirelessifaces)
 				wirelessifaces.push(status)
 			})
-		}
-		var test = i + 1;
-		if (test == SYSINFO.interfaces.length) {
-			console.log(wirelessifaces)
-			cb('success', wirelessifaces)
-		} else {
-			console.log(i + " = " + SYSINFO.interfaces.length)
 		}
 	}
 	console.log(wirelessifaces)
