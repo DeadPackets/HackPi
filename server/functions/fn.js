@@ -138,7 +138,7 @@ export const ScanLocal = (iface, cb) => {
 		if (err)
 			cb('fail', err)
 		console.log(status)
-		/*
+
 		var subnet = ip.subnet(status.ipv4_address, status.ipv4_subnet_mask).subnetMaskLength
 		localrange = status.ipv4_address + '/' + subnet
 		var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
@@ -151,7 +151,6 @@ export const ScanLocal = (iface, cb) => {
 			cb('success', data, nmapscan.scanTime)
 		})
 		nmapscan.startScan()
-		*/
 	})
 
 }
