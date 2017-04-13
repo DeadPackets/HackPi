@@ -48,7 +48,16 @@ export default class HackPi extends Component {
         connected: true
       })
     })
-
+    this.socket.on('connect_error', ()=>{
+      that.setState({
+        connected: false
+      })
+    })
+    this.socket.on('error', ()=>{
+      that.setState({
+        connected: false
+      })
+    })
     this.socket.on('disconnect', ()=>{
       that.setState({
         connected: false

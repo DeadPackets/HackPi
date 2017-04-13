@@ -52,7 +52,7 @@ config/*
 # Xcode
 #
 build/
-ios/
+
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -72,7 +72,7 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
-android/
+
 build/
 .idea
 .gradle
