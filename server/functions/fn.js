@@ -10,22 +10,52 @@ import {
 } from 'child_process';
 import nmap from 'node-nmap';
 import xml2js from 'xml2js';
+import ip from 'ip';
 
 setInterval(() => {
-	//i should probably change this, eeh, later
-	//Shouldnt we call them in order? Why nested?
-	UpdateCPUInfo(() => {
-		UpdateFSInfo(() => {
-			UpdateRAMInfo(() => {
-				UpdateInterfaceInfo(() => {
-					UpdateSwapInfo(() => {
-						UpdateUptime()
-					})
-				})
-			})
-		})
-	})
+	UpdateCPUInfo()
+	UpdateFSInfo()
+	UpdateRAMInfo()
+	UpdateSwapInfo()
+}, 300)
+
+setInterval(() => {
+	UpdateUptime()
 }, 1000)
+
+setInterval(() => {
+	UpdateInterfaceInfo()
+	UpdateInterfaceState()
+}, 5000)
+
+export const UpdateInterfaceState = () => {
+	for (var i = 0; i < SYSINFO.interfaces.length; i++) {
+
+		//Determine type
+		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {
+			SYSINFO.interfaces[i].link = SYSINFO.interfaces[i].link
+		} else if (SYSINFO.interfaces[i].interface.indexOf('mon') < 0) {
+			SYSINFO.interfaces[i].link = 'wireless'
+		} else {
+			SYSINFO.interfaces[i].link = 'monitor-mode'
+		}
+		if (SYSINFO.interfaces[i].status !== undefined) {
+			if (SYSINFO.interfaces[i].status.busy !== true) {
+				SYSINFO.interfaces[i].status.busy = false
+				SYSINFO.interfaces[i].status.process = 'none'
+			}
+		} else {
+			SYSINFO.interfaces[i].status = {
+				busy: false,
+				process: 'none'
+			}
+		}
+
+		if (SYSINFO.interfaces[i].connected !== true) {
+			SYSINFO.interfaces[i].connected = false
+		}
+	}
+}
 
 export const secondsToString = (seconds) => {
 	var numdays = Math.floor(seconds / 86400);
@@ -35,7 +65,7 @@ export const secondsToString = (seconds) => {
 	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
 }
 
-export const UpdateCPUInfo = (cb) => {
+export const UpdateCPUInfo = () => {
 	si.cpuCurrentspeed(function(speed) {
 		si.cpuTemperature(function(temp) {
 			si.currentLoad(function(load) {
@@ -44,13 +74,12 @@ export const UpdateCPUInfo = (cb) => {
 					temp,
 					load
 				}
-				cb()
 			})
 		})
 	})
 }
 
-export const UpdateFSInfo = (cb) => {
+export const UpdateFSInfo = () => {
 	var fssize = si.fsSize(function(fssize) {
 		var ioinfo = si.disksIO(function(ioinfo) {
 			var rwinfo = si.fsStats(function(rwinfo) {
@@ -59,33 +88,32 @@ export const UpdateFSInfo = (cb) => {
 					ioinfo,
 					rwinfo
 				}
-				cb() //Im considering removing the ioinfo and rwinfo vars
 			})
 		})
 	})
 }
 
-export const UpdateInterfaceInfo = (cb) => {
+export const UpdateInterfaceInfo = () => {
 	ifconfig.status((error, interfaces) => {
+		if (error) {
+			console.log(error)
+		}
 		SYSINFO.interfaces = interfaces
-		cb()
 	})
 }
 
-export const UpdateRAMInfo = (cb) => {
+export const UpdateRAMInfo = () => {
 	var usedmem = os.totalmem() - os.freemem()
 	SYSINFO.mem = {
 		free: os.freemem(),
 		total: os.totalmem(),
 		used: usedmem
 	}
-	cb()
 }
 
-export const UpdateSwapInfo = (cb) => {
+export const UpdateSwapInfo = () => {
 	var swapinfo = si.mem(function(data) {
 		SYSINFO.swap = data;
-		cb()
 	})
 }
 
@@ -116,7 +144,6 @@ export const ScanTarget = (iface, target, cb) => {
 	scan.stderr.on('data', (data) => {
 		cb('fail', data)
 	});
-
 	scan.on('exit', () => {
 		fs.readFile('/root/' + target + '.xml', (err, data) => {
 			if (err)
@@ -132,18 +159,26 @@ export const ScanTarget = (iface, target, cb) => {
 	})
 }
 export const ScanLocal = (iface, cb) => {
-	//we should auto calculate the local network of a given interface.
-	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-e ' + iface);
-	console.log("Created new scan")
+	var localrange;
+	ifconfig.status(iface, (err, status) => {
+		if (err)
+			cb('fail', err)
+		var subnet = ip.subnet(status.ipv4_address, status.ipv4_subnet_mask).subnetMaskLength
+		localrange = status.ipv4_address + '/' + subnet
+		var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
+		console.log("Created new scan", localrange)
 
-	nmapscan.on('error', (error) => {
-		cb('fail', error)
-	});
-	//Add to interface status array that this iface is now busy with a ping sweep.
-	nmapscan.on('complete', (data) => {
-		cb('success', data, nmapscan.scanTime)
+		nmapscan.on('error', (error) => {
+			cb('fail', error)
+		});
+		//Add to interface status array that this iface is now busy with a ping sweep.
+		nmapscan.on('complete', (data) => {
+			cb('success', data, nmapscan.scanTime)
+		})
+
+		nmapscan.startScan()
 	})
-	nmapscan.startScan()
+
 }
 
 export const Log = {

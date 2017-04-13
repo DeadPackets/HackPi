@@ -60,17 +60,6 @@ var obj3 = {
 }
 
 */
-
-import {
-	Log,
-	ScanLocal,
-	ScanTarget
-} from './functions/fn';
-
-import {
-	ScanWifi
-} from './functions/wifi';
-
 var SYSINFO = {
 	cpu: {},
 	mem: {},
@@ -79,6 +68,29 @@ var SYSINFO = {
 	swap: {}
 }
 export default SYSINFO;
+
+
+import {
+	Log,
+	ScanLocal,
+	ScanTarget,
+	UpdateInterfaceState
+} from './functions/fn';
+
+import {
+	ScanWifi,
+	CheckIfaceState,
+	DisconnectWifi,
+	CheckAllIfaces,
+	ConnectToWifi,
+	StartMainWifiIface,
+	StopMainWifiIface
+} from './functions/wifi';
+
+import wifi from './functions/wifi';
+
+
+//export default INTERFACE_STATE
 
 //HTTP SERVER INIT
 var server = https.createServer(options, app).listen(port, () => {
@@ -93,8 +105,8 @@ const io = IO(server);
 
 //HTTP GET RULES
 app.get(/^(.+)$/, function(req, res) {
-    	Log.d(req.connection.remoteAddress + " GET " + req.params[0]);
-   	res.sendFile(__dirname + "/web" + req.params[0]);
+	Log.d(req.connection.remoteAddress + " GET " + req.params[0]);
+	res.sendFile(__dirname + "/web" + req.params[0]);
 });
 
 
@@ -102,6 +114,7 @@ io.on('connection', (socket) => {
 
 	socket.on('get system info', (callback) => {
 		callback(SYSINFO)
+		UpdateInterfaceState()
 	})
 
 	socket.on('scan local', (iface, cb) => {
@@ -116,4 +129,27 @@ io.on('connection', (socket) => {
 		ScanWifi(iface, cb)
 	})
 
+	socket.on('list wireless', (cb) => {
+		CheckAllIfaces(cb)
+	})
+
+	socket.on('check wireless', (iface, cb) => {
+		CheckIfaceState(iface, cb)
+	})
+
+	socket.on('connect wifi', (iface, options, cb) => {
+		ConnectToWifi(iface, options, cb)
+	})
+
+	socket.on('disconnect wifi', (iface, cb) => {
+		DisconnectWifi(iface, cb)
+	})
+
+	socket.on('start wifi', (iface) => {
+		StartMainWifiIface(iface)
+	})
+
+	socket.on('stop wifi', (iface) => {
+		StopMainWifiIface(iface)
+	})
 })
