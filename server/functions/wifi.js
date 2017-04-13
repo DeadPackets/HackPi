@@ -11,7 +11,6 @@ import {
 	exec,
 	spawn
 } from 'child_process';
-import INTERFACE_STATE from './fn';
 
 var WIFI = [];
 

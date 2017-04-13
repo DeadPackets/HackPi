@@ -84,8 +84,7 @@ import {
 	CheckAllIfaces,
 	ConnectToWifi,
 	StartMainWifiIface,
-	StopMainWifiIface,
-	INTERFACE_STATE
+	StopMainWifiIface
 } from './functions/wifi';
 
 import wifi from './functions/wifi';

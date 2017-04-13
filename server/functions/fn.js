@@ -12,9 +12,6 @@ import nmap from 'node-nmap';
 import xml2js from 'xml2js';
 import ip from 'ip';
 
-var INTERFACE_STATE = [];
-export default INTERFACE_STATE;
-
 setInterval(() => {
 	//i should probably change this, eeh, later
 	//Shouldnt we call them in order? Why nested?
@@ -24,52 +21,36 @@ setInterval(() => {
 	UpdateInterfaceInfo()
 	UpdateSwapInfo()
 	UpdateUptime()
+	UpdateInterfaceState()
 }, 500)
 
 
 export const UpdateInterfaceState = () => {
+	var count = 0;
 	for (var i = 0; i < SYSINFO.interfaces.length; i++) {
-
+		count++
 		//init
 		var iface = SYSINFO.interfaces[i]
 		var type = ''
 
 		//Determine type
 		if (iface.interface.indexOf('wlan') < 0) {
-			type = iface.link
+			iface.link = iface.link
 		} else if (iface.interface.indexOf('mon') < 0) {
-			type = 'wireless'
+			iface.link = 'wireless'
 		} else {
-			type = 'monitor-mode'
+			iface.link = 'monitor-mode'
 		}
+		if (iface.status) {
+			if (iface.status.busy == true) {
 
-		//put results in place
-		var result = {
-			interface: iface.interface,
-			type: type,
-			mac: iface.address || null,
-			busy: false,
-			status: false,
-			connected: false,
-			isup: iface.up
+			}
 		}
-		INTERFACE_STATE.push(result)
-		console.log("i", i)
-		console.log('iface', INTERFACE_STATE)
-		/*
-				//push to global array
-				for (var i = 0; i < INTERFACE_STATE.length; i++) {
-					console.log('inner', i)
-
-					if (INTERFACE_STATE[i].interface == iface.interface) {
-						console.log("Duplicate result ignored")
-					} else {
-						INTERFACE_STATE.push(result)
-					}
-				}
-		*/
-
+		iface.status.busy = false
+		iface.status.process = 'none'
+		iface.connected = false
 	}
+	console.log(SYSINFO.interfaces.length)
 }
 
 export const secondsToString = (seconds) => {
