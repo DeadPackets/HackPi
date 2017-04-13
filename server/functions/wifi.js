@@ -37,7 +37,7 @@ export const DisconnectWifi = (iface, cb) => {
 }
 
 export const CheckAllIfaces = (cb) => {
-	for (var i = 0; i < SYSINFO.interface.length; i++)
+	for (var i = 0; i < SYSINFO.interfaces.length; i++)
 		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {} else {
 			console.log(SYSINFO.interfaces[i].interface)
 			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
