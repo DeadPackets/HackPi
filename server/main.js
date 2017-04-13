@@ -132,4 +132,8 @@ io.on('connection', (socket) => {
 		CheckIfaceState(iface, cb)
 	})
 
+	socket.on('connect wifi', (iface, options, cb) => {
+		ConnectToWifi(iface, options, cb)
+	})
+
 })
