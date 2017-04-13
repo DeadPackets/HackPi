@@ -47,7 +47,8 @@ export const CheckAllIfaces = (cb) => {
 				wirelessifaces.push(status)
 			})
 		}
-		if (i == SYSINFO.interfaces.length) {
+		var test = i++;
+		if (test == SYSINFO.interfaces.length) {
 			console.log(wirelessifaces)
 			cb('success', wirelessifaces)
 		} else {
