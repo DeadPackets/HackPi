@@ -78,7 +78,11 @@ var SYSINFO = {
 	interfaces: {},
 	swap: {}
 }
+
+var INTERFACE_STATE = [];
+
 export default SYSINFO;
+//export default INTERFACE_STATE
 
 //HTTP SERVER INIT
 var server = https.createServer(options, app).listen(port, () => {
@@ -93,8 +97,8 @@ const io = IO(server);
 
 //HTTP GET RULES
 app.get(/^(.+)$/, function(req, res) {
-    	Log.d(req.connection.remoteAddress + " GET " + req.params[0]);
-   	res.sendFile(__dirname + "/web" + req.params[0]);
+	Log.d(req.connection.remoteAddress + " GET " + req.params[0]);
+	res.sendFile(__dirname + "/web" + req.params[0]);
 });
 
 

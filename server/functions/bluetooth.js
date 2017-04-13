@@ -14,7 +14,11 @@ export const BluetoothToggle = (iface, cb) => {
 }
 
 export const DoSBluetooth = (iface, device, cb) => {
-	//Denial of service for bluetooth here	
+	//Denial of service for bluetooth here
+}
+
+export const BluetoothPingFlood = (iface, device, cb) => {
+	//Ping flood
 }
 
 export const BlueoothPing = (iface, device, cb) => {

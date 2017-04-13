@@ -4,12 +4,14 @@ import si from 'systeminformation';
 import os from 'os';
 import ifconfig from 'wireless-tools/ifconfig'
 import SYSINFO from '../main';
+import INTERFACE_STATE from '../main';
 import {
 	exec,
 	spawn
 } from 'child_process';
 import nmap from 'node-nmap';
 import xml2js from 'xml2js';
+import ip from 'ip';
 
 setInterval(() => {
 	//i should probably change this, eeh, later
@@ -116,7 +118,6 @@ export const ScanTarget = (iface, target, cb) => {
 	scan.stderr.on('data', (data) => {
 		cb('fail', data)
 	});
-
 	scan.on('exit', () => {
 		fs.readFile('/root/' + target + '.xml', (err, data) => {
 			if (err)
@@ -132,18 +133,27 @@ export const ScanTarget = (iface, target, cb) => {
 	})
 }
 export const ScanLocal = (iface, cb) => {
-	//we should auto calculate the local network of a given interface.
-	var nmapscan = new nmap.nodenmap.NmapScan('52.32.224.1/28', '-sn', '-T4', '--max-retries 1', '-e ' + iface);
-	console.log("Created new scan")
-
-	nmapscan.on('error', (error) => {
-		cb('fail', error)
-	});
-	//Add to interface status array that this iface is now busy with a ping sweep.
-	nmapscan.on('complete', (data) => {
-		cb('success', data, nmapscan.scanTime)
+	var localrange;
+	ifconfig.status(iface, (err, status) => {
+		if (err)
+			cb('fail', err)
+		console.log(status)
+		/*
+		var subnet = ip.subnet(status.ipv4_address, status.ipv4_subnet_mask).subnetMaskLength
+		localrange = status.ipv4_address + '/' + subnet
+		var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
+		console.log("Created new scan", localrange)
+		nmapscan.on('error', (error) => {
+			cb('fail', error)
+		});
+		//Add to interface status array that this iface is now busy with a ping sweep.
+		nmapscan.on('complete', (data) => {
+			cb('success', data, nmapscan.scanTime)
+		})
+		nmapscan.startScan()
+		*/
 	})
-	nmapscan.startScan()
+
 }
 
 export const Log = {
