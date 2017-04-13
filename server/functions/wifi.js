@@ -44,7 +44,7 @@ export const CheckAllIfaces = (cb) => {
 			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
 				if (err)
 					cb('fail', err)
-				cb(status)
+				cb('success', status)
 				wirelessifaces.push(status)
 			})
 		}
