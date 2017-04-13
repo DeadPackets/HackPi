@@ -44,13 +44,11 @@ export const CheckAllIfaces = (cb) => {
 			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
 				if (err)
 					cb('fail', err)
-				cb('success', status)
+				wirelessifaces.push(status)
 			})
 			var count = SYSINFO.interfaces.length - 1
 			if (i == count) {
-				console.log("aa")
-			} else {
-				console.log(i)
+				cb('success', wirelessifaces)
 			}
 		}
 	}
