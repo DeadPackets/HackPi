@@ -45,8 +45,13 @@ export const CheckAllIfaces = (cb) => {
 				if (err)
 					cb('fail', err)
 				cb('success', status)
-				wirelessifaces.push(status)
 			})
+			var count = SYSINFO.interfaces.length - 1
+			if (i == count) {
+				console.log("aa")
+			} else {
+				console.log(i)
+			}
 		}
 	}
 }
