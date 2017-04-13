@@ -54,7 +54,7 @@ export const WPSPixie = (iface, wifi, cb) => {
 export const ConnectToWifi = (iface, wifi, cb) => {
 	/*
 	var wifi = {
-	    bssid: xx:xx:xx:xx
+	    bssid: xx:xx:xx:xx //optional
 	    essid: "FreeWifi"
 	    security: {
 	        passphrase: "secretpass"

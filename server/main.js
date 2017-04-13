@@ -71,7 +71,8 @@ import {
 	ScanWifi,
 	CheckIfaceState,
 	DisconnectWifi,
-	CheckAllIfaces
+	CheckAllIfaces,
+	ConnectToWifi
 } from './functions/wifi';
 
 var SYSINFO = {
