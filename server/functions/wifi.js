@@ -44,13 +44,11 @@ export const CheckAllIfaces = (cb) => {
 			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
 				if (err)
 					cb('fail', err)
-				console.log(status)
-				console.log(wirelessifaces)
+				cb(status)
 				wirelessifaces.push(status)
 			})
 		}
 	}
-	console.log(wirelessifaces)
 }
 
 export const WPSPixie = (iface, wifi, cb) => {
