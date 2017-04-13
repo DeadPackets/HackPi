@@ -37,22 +37,13 @@ export const DisconnectWifi = (iface, cb) => {
 }
 
 export const CheckAllIfaces = (cb) => {
-	var wirelessifaces = []
-	for (var i = 0; i < SYSINFO.interfaces.length; i++) {
-		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {} else {
-			console.log(SYSINFO.interfaces[i].interface)
-			iwconfig.status(SYSINFO.interfaces[i].interface, (err, status) => {
-				if (err)
-					cb('fail', err)
-				wirelessifaces.push(status)
-			})
-			var count = SYSINFO.interfaces.length - 1
-			if (i == count) {
-				console.log(SYSINFO.interfaces.length, i, count)
-				cb('success', wirelessifaces)
-			}
+	iwconfig.status((err, status) => {
+		if (err) {
+			cb('fail', err)
+		} else {
+			cb('success', status)
 		}
-	}
+	})
 }
 
 export const WPSPixie = (iface, wifi, cb) => {
