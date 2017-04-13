@@ -11,6 +11,7 @@ import {
 	exec,
 	spawn
 } from 'child_process';
+import INTERFACE_STATE from './fn';
 
 var WIFI = [];
 
@@ -30,6 +31,7 @@ export const StartWifiIface = (iface) => {
 	wifi.enable((err) => {
 		wifi.start();
 	})
+
 	/*
 		wifi.on('appear', (data, iface) => {
 			console.log(data)

@@ -60,11 +60,21 @@ var obj3 = {
 }
 
 */
+var SYSINFO = {
+	cpu: {},
+	mem: {},
+	fs: {},
+	interfaces: {},
+	swap: {}
+}
+export default SYSINFO;
+
 
 import {
 	Log,
 	ScanLocal,
-	ScanTarget
+	ScanTarget,
+	UpdateInterfaceState
 } from './functions/fn';
 
 import {
@@ -74,22 +84,13 @@ import {
 	CheckAllIfaces,
 	ConnectToWifi,
 	StartMainWifiIface,
-	StopMainWifiIface
+	StopMainWifiIface,
+	INTERFACE_STATE
 } from './functions/wifi';
 
 import wifi from './functions/wifi';
 
-var SYSINFO = {
-	cpu: {},
-	mem: {},
-	fs: {},
-	interfaces: {},
-	swap: {}
-}
 
-var INTERFACE_STATE = [];
-
-export default SYSINFO;
 //export default INTERFACE_STATE
 
 //HTTP SERVER INIT
@@ -114,6 +115,7 @@ io.on('connection', (socket) => {
 
 	socket.on('get system info', (callback) => {
 		callback(SYSINFO)
+		UpdateInterfaceState()
 	})
 
 	socket.on('scan local', (iface, cb) => {
