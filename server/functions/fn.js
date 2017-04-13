@@ -13,39 +13,48 @@ import xml2js from 'xml2js';
 import ip from 'ip';
 
 setInterval(() => {
-	//i should probably change this, eeh, later
-	//Shouldnt we call them in order? Why nested?
 	UpdateCPUInfo()
 	UpdateFSInfo()
 	UpdateRAMInfo()
-	UpdateInterfaceInfo()
 	UpdateSwapInfo()
-	UpdateUptime()
-	UpdateInterfaceState()
-}, 500)
+}, 300)
 
+setInterval(() => {
+	UpdateUptime()
+}, 1000)
+
+setInterval(() => {
+	UpdateInterfaceInfo()
+	UpdateInterfaceState()
+}, 5000)
 
 export const UpdateInterfaceState = () => {
-	var count = 0;
 	for (var i = 0; i < SYSINFO.interfaces.length; i++) {
-		count++
-		//init
-		var iface = SYSINFO.interfaces[i]
-		var type = ''
 
 		//Determine type
-		if (iface.interface.indexOf('wlan') < 0) {
-			iface.link = iface.link
-		} else if (iface.interface.indexOf('mon') < 0) {
-			iface.link = 'wireless'
+		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {
+			SYSINFO.interfaces[i].link = SYSINFO.interfaces[i].link
+		} else if (SYSINFO.interfaces[i].interface.indexOf('mon') < 0) {
+			SYSINFO.interfaces[i].link = 'wireless'
 		} else {
-			iface.link = 'monitor-mode'
+			SYSINFO.interfaces[i].link = 'monitor-mode'
 		}
-		iface.status.busy = false
-		iface.status.process = 'none'
-		iface.connected = false
+		if (SYSINFO.interfaces[i].status !== undefined) {
+			if (SYSINFO.interfaces[i].status.busy !== true) {
+				SYSINFO.interfaces[i].status.busy = false
+				SYSINFO.interfaces[i].status.process = 'none'
+			}
+		} else {
+			SYSINFO.interfaces[i].status = {
+				busy: false,
+				process: 'none'
+			}
+		}
+
+		if (SYSINFO.interfaces[i].connected !== true) {
+			SYSINFO.interfaces[i].connected = false
+		}
 	}
-	console.log(SYSINFO.interfaces.length)
 }
 
 export const secondsToString = (seconds) => {
@@ -86,6 +95,9 @@ export const UpdateFSInfo = () => {
 
 export const UpdateInterfaceInfo = () => {
 	ifconfig.status((error, interfaces) => {
+		if (error) {
+			console.log(error)
+		}
 		SYSINFO.interfaces = interfaces
 	})
 }
@@ -129,14 +141,6 @@ export const ScanTarget = (iface, target, cb) => {
 	var parser = new xml2js.Parser();
 	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml -e ' + iface + ' ' + target)
 	console.log("Scan started!")
-	var index;
-	for (var i = 0; i < INTERFACE_STATE.length; i++) {
-		if (INTERFACE_STATE[i].interface.indexOf(iface) < 0) {} else {
-			INTERFACE_STATE[i].busy = true
-			INTERFACE_STATE[i].state = "Targeted port scanning on " + target
-			index = i
-		}
-	}
 	scan.stderr.on('data', (data) => {
 		cb('fail', data)
 	});
@@ -151,8 +155,6 @@ export const ScanTarget = (iface, target, cb) => {
 				console.log('Done');
 			});
 		});
-		INTERFACE_STATE[index].busy = false
-		INTERFACE_STATE[index].state = false
 		//Reminder to add delete function here
 	})
 }
@@ -166,23 +168,12 @@ export const ScanLocal = (iface, cb) => {
 		var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
 		console.log("Created new scan", localrange)
 
-		var index;
-		for (var i = 0; i < INTERFACE_STATE.length; i++) {
-			if (INTERFACE_STATE[i].interface.indexOf(iface) < 0) {} else {
-				INTERFACE_STATE[i].busy = true
-				INTERFACE_STATE[i].state = "Local port scan on " + localrange
-				index = i
-			}
-		}
-
 		nmapscan.on('error', (error) => {
 			cb('fail', error)
 		});
 		//Add to interface status array that this iface is now busy with a ping sweep.
 		nmapscan.on('complete', (data) => {
 			cb('success', data, nmapscan.scanTime)
-			INTERFACE_STATE[index].busy = false
-			INTERFACE_STATE[index].state = false
 		})
 
 		nmapscan.startScan()
