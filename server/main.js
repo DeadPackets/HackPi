@@ -127,4 +127,8 @@ io.on('connection', (socket) => {
 		CheckAllIfaces(cb)
 	})
 
+	socket.on('check wireless', (iface, cb) => {
+		CheckIfaceState(iface, cb)
+	})
+
 })
