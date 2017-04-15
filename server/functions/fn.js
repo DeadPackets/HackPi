@@ -17,6 +17,7 @@ setInterval(() => {
 	UpdateFSInfo()
 	UpdateRAMInfo()
 	UpdateSwapInfo()
+	UpdateInterfaceState()
 }, 300)
 
 setInterval(() => {
@@ -25,7 +26,6 @@ setInterval(() => {
 
 setInterval(() => {
 	UpdateInterfaceInfo()
-	UpdateInterfaceState()
 }, 5000)
 
 export const UpdateInterfaceState = () => {
@@ -51,7 +51,9 @@ export const UpdateInterfaceState = () => {
 			}
 		}
 
-		if (SYSINFO.interfaces[i].connected !== true) {
+		if (SYSINFO.interfaces[i].ipv4_address || SYSINFO.interfaces[i].ipv6_address) {
+			SYSINFO.interfaces[i].connected = true
+		} else {
 			SYSINFO.interfaces[i].connected = false
 		}
 	}
@@ -94,12 +96,15 @@ export const UpdateFSInfo = () => {
 }
 
 export const UpdateInterfaceInfo = () => {
+
 	ifconfig.status((error, interfaces) => {
 		if (error) {
 			console.log(error)
 		}
+
 		SYSINFO.interfaces = interfaces
 	})
+
 }
 
 export const UpdateRAMInfo = () => {

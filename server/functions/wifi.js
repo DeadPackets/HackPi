@@ -14,7 +14,7 @@ import {
 
 var WIFI = [];
 
-export const StartWifiIface = (iface) => {
+export const StartWifiIface = (iface, cb) => {
 
 	var wifi = new Wireless({
 		iface: iface
@@ -28,7 +28,9 @@ export const StartWifiIface = (iface) => {
 	WIFI.push(wireless)
 
 	wifi.enable((err) => {
-		wifi.start();
+		if (err) {
+			cb(err)
+		}
 	})
 
 	/*
@@ -59,7 +61,7 @@ export const StartWifiIface = (iface) => {
 }
 export const StopMainWifiIface = (cb) => {
 	WIFI.stop(function(data) {
-		console.log(data)
+		cb(data)
 	})
 }
 
