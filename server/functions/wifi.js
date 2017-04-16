@@ -4,7 +4,7 @@ import iwconfig from 'wireless-tools/iwconfig';
 //import iwlist from 'wireless-tools/iwlist';
 //import iw from 'wireless-tools/iw';
 //import udhcpc from 'wireless-tools/udhcpc';
-//import wpa_supplicant from 'wireless-tools/wpa_supplicant';
+import wpa_supplicant from 'wireless-tools/wpa_supplicant';
 import SYSINFO from '../main';
 import Wireless from './node-wireless/index';
 import {
@@ -29,7 +29,7 @@ export const StartWifiIface = (iface, cb) => {
 
 	wifi.enable((err) => {
 		if (err) {
-			cb(err)
+			cb('fail', err)
 		}
 	})
 

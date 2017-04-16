@@ -4,6 +4,7 @@ import si from 'systeminformation';
 import os from 'os';
 import ifconfig from 'wireless-tools/ifconfig'
 import SYSINFO from '../main';
+import _ from 'underscore';
 import {
 	exec,
 	spawn
@@ -12,49 +13,102 @@ import nmap from 'node-nmap';
 import xml2js from 'xml2js';
 import ip from 'ip';
 
+var IFCONFIG_IFACES = [];
+var TRACK_IFACES = [];
+var IFACES_STATE = [];
+export default IFACES_STATE;
+/*
+
+Global object method
+
+var IFACES_STATE = {
+ifaces: [],
+state: [{}, {}]
+}
+*/
+
 setInterval(() => {
 	UpdateCPUInfo()
 	UpdateFSInfo()
 	UpdateRAMInfo()
 	UpdateSwapInfo()
-	UpdateInterfaceState()
 }, 300)
+
+setInterval(() => {
+	UpdateInterfaceInfo()
+}, 100)
 
 setInterval(() => {
 	UpdateUptime()
 }, 1000)
 
 setInterval(() => {
-	UpdateInterfaceInfo()
-}, 5000)
+	UpdateInterfaceState()
+}, 500)
 
+var firstrun = true;
 export const UpdateInterfaceState = () => {
-	for (var i = 0; i < SYSINFO.interfaces.length; i++) {
-
-		//Determine type
-		if (SYSINFO.interfaces[i].interface.indexOf('wlan') < 0) {
-			SYSINFO.interfaces[i].link = SYSINFO.interfaces[i].link
-		} else if (SYSINFO.interfaces[i].interface.indexOf('mon') < 0) {
-			SYSINFO.interfaces[i].link = 'wireless'
-		} else {
-			SYSINFO.interfaces[i].link = 'monitor-mode'
-		}
-		if (SYSINFO.interfaces[i].status !== undefined) {
-			if (SYSINFO.interfaces[i].status.busy !== true) {
-				SYSINFO.interfaces[i].status.busy = false
-				SYSINFO.interfaces[i].status.process = 'none'
+	if (firstrun == true) {
+		//running for the first time, push all interfaces to global array
+		IFCONFIG_IFACES.forEach((data, index) => {
+			TRACK_IFACES.push(data)
+			var obj = {
+				interface: data,
+				state: {
+					busy: false,
+					process: 'none'
+				}
 			}
+			IFACES_STATE.push(obj)
+			console.log("Added interface " + data + "!")
+		})
+		//not first time anymore
+		firstrun = false
+	} else {
+		//this isnt the first time this function is run
+		if (IFCONFIG_IFACES.length > TRACK_IFACES.length) {
+			//new interface plugged in
+			var diff = _.difference(IFCONFIG_IFACES, TRACK_IFACES) //returns new interface name
+			diff.forEach((data, index) => {
+				console.log("Interface " + data + " was added.", TRACK_IFACES)
+				TRACK_IFACES.push(data)
+				var obj = {
+					interface: data,
+					state: {
+						busy: false,
+						process: 'none'
+					}
+				}
+				IFACES_STATE.push(obj)
+				console.log(TRACK_IFACES)
+			})
+		} else if (IFCONFIG_IFACES.length < TRACK_IFACES.length) {
+			//interface disconnected
+			var diff = _.difference(TRACK_IFACES, IFCONFIG_IFACES) //returns interface that was disconnected
+			diff.forEach((data, index) => {
+				console.log("Interface " + data + " was removed.", TRACK_IFACES)
+				var i = TRACK_IFACES.indexOf(data)
+				TRACK_IFACES.splice(i, 1)
+				IFACES_STATE.splice(i, 1)
+				console.log(TRACK_IFACES)
+			})
 		} else {
-			SYSINFO.interfaces[i].status = {
-				busy: false,
-				process: 'none'
-			}
-		}
+			//run check to see if any interface was renamed
+			//this is where things get complicated. If an interface was renamed....oh. Wait.
 
-		if (SYSINFO.interfaces[i].ipv4_address || SYSINFO.interfaces[i].ipv6_address) {
-			SYSINFO.interfaces[i].connected = true
-		} else {
-			SYSINFO.interfaces[i].connected = false
+			/*
+
+			//Reason this is commented out is, I expected monitor mode to rename interfaces into mon0 and such, turns out it simply just adds a new iface.
+			//I might add this for compatability with other distros later.
+
+			TRACK_IFACES.forEach((data, index) => {
+				if (TRACK_IFACES[index] == IFACES_STATE[index].interface) {
+					//console.log("Nothing wrong here.")
+				} else {
+					console.log("Interface " + IFACES_STATE[index].interface + " was renamed to " + TRACK_IFACES[index] + "!")
+				}
+			})
+			*/
 		}
 	}
 }
@@ -99,10 +153,15 @@ export const UpdateInterfaceInfo = () => {
 
 	ifconfig.status((error, interfaces) => {
 		if (error) {
-			console.log(error)
+			console.log("Error!")
 		}
-
-		SYSINFO.interfaces = interfaces
+		if (interfaces) {
+			SYSINFO.interfaces = interfaces
+			IFCONFIG_IFACES = []
+			interfaces.forEach((data, index) => {
+				IFCONFIG_IFACES.push(data.interface)
+			})
+		}
 	})
 
 }
@@ -143,6 +202,7 @@ export const ScanNetworkPort = (iface, port, cb) => {
 }
 
 export const ScanTarget = (iface, target, cb) => {
+
 	var parser = new xml2js.Parser();
 	const scan = exec('nmap -sS -sV -T4 -Pn --max-retries 2 -O --min-rate 300 --no-stylesheet -oX /root/' + target + '.xml -e ' + iface + ' ' + target)
 	console.log("Scan started!")
@@ -160,7 +220,11 @@ export const ScanTarget = (iface, target, cb) => {
 				console.log('Done');
 			});
 		});
-		//Reminder to add delete function here
+		//delete xml scan result when done
+		fs.unlink('/root' + target + '.xml', (err) => {
+			if (err)
+				console.log(err)
+		})
 	})
 }
 export const ScanLocal = (iface, cb) => {
@@ -168,20 +232,31 @@ export const ScanLocal = (iface, cb) => {
 	ifconfig.status(iface, (err, status) => {
 		if (err)
 			cb('fail', err)
-		var subnet = ip.subnet(status.ipv4_address, status.ipv4_subnet_mask).subnetMaskLength
-		localrange = status.ipv4_address + '/' + subnet
-		var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
-		console.log("Created new scan", localrange)
+		var check = TRACK_IFACES.indexOf(iface)
+		if (IFACES_STATE[check].state.busy == false) {
+			var subnet = ip.subnet(status.ipv4_address, status.ipv4_subnet_mask).subnetMaskLength
+			localrange = status.ipv4_address + '/' + subnet
 
-		nmapscan.on('error', (error) => {
-			cb('fail', error)
-		});
-		//Add to interface status array that this iface is now busy with a ping sweep.
-		nmapscan.on('complete', (data) => {
-			cb('success', data, nmapscan.scanTime)
-		})
+			IFACES_STATE[check].state.busy = true
+			IFACES_STATE[check].state.process = "Local nmap scan of range " + localrange
 
-		nmapscan.startScan()
+			var nmapscan = new nmap.nodenmap.NmapScan(localrange, '-sn', '-T4', '--max-retries 1', '-e ' + iface);
+			console.log("Created new scan", localrange)
+
+			nmapscan.on('error', (error) => {
+				cb('fail', error)
+			});
+			//Add to interface status array that this iface is now busy with a ping sweep.
+			nmapscan.on('complete', (data) => {
+				IFACES_STATE[check].state.busy = false
+				IFACES_STATE[check].state.process = 'none'
+				cb('success', data, nmapscan.scanTime)
+			})
+
+			nmapscan.startScan()
+		} else {
+			cb("Cannot use specified interface, it is busy.", iface, IFACES_STATE[check].state.process) //TODO: change to normal syntax
+		}
 	})
 
 }
