@@ -1,3 +1,13 @@
+/*
+TODO:
+
+- WPS Pixie attacks
+- Karma AP attacks
+- DeAuth attacks
+- Probe spam attacks
+- Implement WEP cracking (this has such a low priority though due to the time it takes)
+
+*/
 import hostapd from 'wireless-tools/hostapd';
 import ifconfig from 'wireless-tools/ifconfig';
 import iwconfig from 'wireless-tools/iwconfig';
@@ -65,6 +75,7 @@ export const StopMainWifiIface = (cb) => {
 	})
 }
 
+//i dont think we need this anymore
 export const CheckIfaceState = (iface, cb) => {
 	//needs to check if interface is up and so on
 	iwconfig.status(iface, (err, status) => {
@@ -77,9 +88,10 @@ export const CheckIfaceState = (iface, cb) => {
 export const ScanWifi = (iface, cb) => {}
 
 export const DisconnectWifi = (iface, cb) => {
-
+	//I think this purely depends on the security of the connected router
 }
 
+//this is useless at this point
 export const CheckAllIfaces = (cb) => {
 	iwconfig.status((err, status) => {
 		if (err) {
@@ -92,14 +104,15 @@ export const CheckAllIfaces = (cb) => {
 
 export const WPSPixie = (iface, options, cb) => {
 	//run wps pixie command on wifi
+	//needs also output processing
 	//needs error handling (timeout and stuff)
 }
 export const EnableMonitorMode = (iface, cb) => {
-
+	//Add the "busy" tag to the interfaces
 }
 
 export const DisableMonitorMode = (iface, cb) => {
-
+	//Remove the busy tag from the interface
 }
 
 export const ConnectToWifi = (iface, options, cb) => {
@@ -113,5 +126,18 @@ export const ConnectToWifi = (iface, options, cb) => {
 	    }
 	}
 	*/
+	if (options.security !== 'open') {
+		//OPEN goes here
+		//native commands are the only way
+	} else {
+		//encrypted wifi
+		if (options.security == 'wep') {
+			//WEP goes here
+			//I think we will have to use native comamnds here
+		} else {
+			//WPA or WPA2 goes here
+			//we can use wpa_supplicant for this one
+		}
+	}
 
 }
