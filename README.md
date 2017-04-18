@@ -9,7 +9,7 @@ HackPi is a NodeJS project to turn a raspberry pi running kali into a fully port
 ---
 - Realtime updates using Socket.io
 - Online terminal with https (auto starts on boot)
-- Ad-hoc style access point for connectivity that starts on boot
+- Access point for connectivity that starts on boot
 - System stats
 - Map out surrounding network in a network graph
 - Listing available network interfaces
