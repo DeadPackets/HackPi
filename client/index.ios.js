@@ -18,7 +18,6 @@ export default class HackPi extends Component {
       connected: false
     }
     this.socket = null;
-    this.listen = this.listen.bind(this)
   }
   componentWillMount() {
     AsyncStorage.getItem('@HackPi:IP', (err, result)=>{
@@ -31,53 +30,35 @@ export default class HackPi extends Component {
         console.log(result)
         if(result){
           this.socket = io.connect(result, { secure: false, jsonp: false, reconnectionDelay: 5000, transports: ['websocket'], upgrade: false, debug: true })
-          this.listen()
         } else {
           this.socket = io.connect("192.168.69.1:1337", { secure: false, jsonp: false, reconnectionDelay: 5000, transports: ['websocket'], upgrade: false, debug: true })
-          this.listen()
         }
         this.setState(this.state)
       }
     })
-    
-  }
-  listen() {
-    var that = this;
-    this.socket.on('connect', ()=>{
-      that.setState({
-        connected: true
-      })
-    })
-    this.socket.on('connect_error', ()=>{
-      that.setState({
-        connected: false
-      })
-    })
-    this.socket.on('error', ()=>{
-      that.setState({
-        connected: false
-      })
-    })
-    this.socket.on('disconnect', ()=>{
-      that.setState({
-        connected: false
-      })
-    })    
+
   }
   render() {
     console.log(!this.state.error && this.socket)
-    if(!this.state.error && this.socket)
+    if(!this.state.error && this.socket){
+    //will implement Navigator soon
+    var appropriateScreen;
+    if(this.socket.connected == true) {
+      appropriateScreen = <App socket={this.socket} />
+    } else {
+      appropriateScreen = <SocketLoader socket={this.socket} />
+    }
       return (
         <View style={{ flex: 1 }}>
           <StatusBar
             barStyle="light-content"
           />
-          <SocketLoader socket={this.socket} connected={this.state.connected} />
-          <App socket={this.socket} connected={this.state.connected} />
+          {appropriateScreen}
         </View>
       )
-    else
+    } else {
       return null
+    }
   }
 }
 
