@@ -17,7 +17,6 @@ HackPi is a NodeJS project to turn a raspberry pi running kali into a fully port
 
 ### Todo
 ---
-- Update the Features (xD)
 - Work on at least inital client side
 - Client side system information (Done, just needs to be inserted into client)
 - Listing available WiFi points (90% done)
@@ -26,6 +25,7 @@ HackPi is a NodeJS project to turn a raspberry pi running kali into a fully port
 - Ability to track down running processes (If I run a mass wifi jamming attack, I want to be able to stop it even if I refresh the page)
 - Listing available bluetooth devices + attacks + functionality (turning bluetooth on/off)
 - WiFi interface functionality (bringing interfaces up or down, randomizing mac, etc)
-- And waaay more.
-
+- Bluetooth attacks
+- Network attacks (Everything from ping flood to MiTM)
+- KarmaAP attack with Captive Portal (Credits to mana-toolkit by SensePost)
 
