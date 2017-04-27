@@ -2,6 +2,7 @@
     	secure: true
     })
 
+    /*
     var options = {
     	autoResize: true,
     	height: '100%',
@@ -110,52 +111,65 @@
 
     //  socket.emit('scan local', 'eth0', DrawNetwork(state, data, scantime))
 
+*/
+    setInterval(function() {
+    	socket.emit('get system info', function(data) {
 
-    socket.emit('get system info', function(data) {
+    		//Parsing general data
+    		var uptime = data.uptime
+    		var osuptime = data.osuptime
+    		var freemem = data.mem.free
+    		var usedmem = data.mem.used
+    		var totalmem = data.mem.total
+    		var swapfree = data.swap.swapfree
+    		var swapused = data.swap.swapused
+    		var swaptotal = data.swap.swaptotal
+    		var cpuload = data.cpu.load.avgload
+    		var cpuspeed = data.cpu.speed.avg
+    		var cputemp = data.cpu.temp.main
+    		$('.uptime').text(uptime)
+    		$('.osuptime').text(osuptime)
+    		$('.freemem').text(freemem)
+    		$('.usedmem').text(usedmem)
+    		$('.totalmem').text(totalmem)
+    		$('.swapused').text(swapused)
+    		$('.swaptotal').text(swaptotal)
+    		$('.cpuload').text(cpuload)
+    		$('.cpuspeed').text(cpuspeed)
+    		$('.cputemp').text(cputemp)
 
-    	//Parsing general data
-    	var uptime = data.uptime
-    	var osuptime = data.osuptime
-    	var freemem = data.mem.free / 1073741824
-    	var usedmem = data.mem.used / 1073741824
-    	var totalmem = data.mem.total / 1073741824
-    	var swapfree = data.swap.swapfree
-    	var swapused = data.swap.swapused
-    	var swaptotal = data.swap.swaptotal
-    	var cpuload = data.cpu.load.avgload
-    	var cpuspeed = data.cpu.speed.avg
-    	var cputemp = data.cpu.temp.main
-
-    	//Parsing fs data
-    	for (var i = 0; i < data.fs.fssize.length; i++) {
-    		var fs = data.fs.fssize[i]
-    		var disk = fs.fs
-    		var mountpoint = fs.mount
-    		var fstype = fs.type
-    		var fssize = fs.size
-    		var fsused = fs.used
-    		var fsusedpercent = fs.use
-    	}
-
-    	//Parsing interface data
-    	for (var i = 0; i < data.interfaces.length; i++) {
-    		var iface = data.interfaces[i]
-    		var mac = iface.address || null
-    		var ifacename = iface.interface
-    		var ipv4addr = iface.ipv4_address || null
-    		var ipv6addr = iface.ipv6_address || null
-    		var isloopback = iface.loopback || false
-    		var isup = iface.up
-    		var isrunning = iface.running || false
-    		if (iface.interface.indexOf('wlan') < 0) {
-    			var type = iface.link
-    		} else if (iface.interface.indexOf('mon') < 0) {
-    			var type = 'wireless'
-    		} else {
-    			var type = 'monitor-mode'
+    		//Parsing fs data
+    		for (var i = 0; i < data.fs.fssize.length; i++) {
+    			var fs = data.fs.fssize[i]
+    			var disk = fs.fs
+    			var mountpoint = fs.mount
+    			var fstype = fs.type
+    			var fssize = fs.size
+    			var fsused = fs.used
+    			var fsusedpercent = fs.use
+    			$('.fs').append(`<div id="fs-disk-${i}">${fs} ${disk} ${mountpoint} ${fstype}</div>`)
     		}
-    		var broadcast = iface.broadcast || false
-    		var multicast = iface.multicast || false
-    		console.log(ifacename + " " + mac + " " + type)
-    	}
-    })
+
+    		//Parsing interface data
+    		for (var i = 0; i < data.interfaces.length; i++) {
+    			var iface = data.interfaces[i]
+    			var mac = iface.address || null
+    			var ifacename = iface.interface
+    			var ipv4addr = iface.ipv4_address || null
+    			var ipv6addr = iface.ipv6_address || null
+    			var isloopback = iface.loopback || false
+    			var isup = iface.up
+    			var isrunning = iface.running || false
+    			if (iface.interface.indexOf('wlan') < 0) {
+    				var type = iface.link
+    			} else if (iface.interface.indexOf('mon') < 0) {
+    				var type = 'wireless'
+    			} else {
+    				var type = 'monitor-mode'
+    			}
+    			var broadcast = iface.broadcast || false
+    			var multicast = iface.multicast || false
+    			//console.log(ifacename + " " + mac + " " + type)
+    		}
+    	})
+    }, 600)

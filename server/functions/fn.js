@@ -12,6 +12,7 @@ import {
 import nmap from 'node-nmap';
 import xml2js from 'xml2js';
 import ip from 'ip';
+import prettyBytes from 'pretty-bytes';
 
 var IFCONFIG_IFACES = [];
 var TRACK_IFACES = [];
@@ -108,14 +109,25 @@ export const UpdateInterfaceState = () => {
 		*/
 	}
 }
-}
 
 export const secondsToString = (seconds) => {
 	var numdays = Math.floor(seconds / 86400);
 	var numhours = Math.floor((seconds % 86400) / 3600);
 	var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
-	var numseconds = ((seconds % 86400) % 3600) % 60;
-	return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
+	var numseconds = Math.floor(((seconds % 86400) % 3600) % 60);
+	if (numdays < 1) {
+		if (numhours < 1) {
+			if (numminutes < 1) {
+				return numseconds + " seconds";
+			} else {
+				return numminutes + " minutes " + numseconds + " seconds";
+			}
+		} else {
+			return numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
+		}
+	} else {
+		return numdays + " days " + numhours + " hours " + numminutes + " minutes " + numseconds + " seconds";
+	}
 }
 
 export const UpdateCPUInfo = () => {
@@ -166,9 +178,9 @@ export const UpdateInterfaceInfo = () => {
 export const UpdateRAMInfo = () => {
 	var usedmem = os.totalmem() - os.freemem()
 	SYSINFO.mem = {
-		free: os.freemem(),
-		total: os.totalmem(),
-		used: usedmem
+		free: prettyBytes(os.freemem()),
+		total: prettyBytes(os.totalmem()),
+		used: prettyBytes(usedmem)
 	}
 }
 

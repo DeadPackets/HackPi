@@ -1,12 +1,24 @@
 import Scanner from 'bluetooth-scanner';
 import bluetooth from 'bluetooth';
+import {
+	exec,
+	spawn
+} from 'child_process';
 
 export const ListBluetoothIfaces = (cb) => {
 	//exec hciconfig here
+	const listbluetooth = exec('hciconfig')
+
+	listbluetooth.stderr.on('data', (data) => {
+		cb('fail', data)
+	})
+
+	//catch stdout here
 }
 
 export const BluetoothState = (iface, cb) => {
 	//todo using bluetooth package
+
 }
 
 export const BluetoothToggle = (iface, cb) => {
