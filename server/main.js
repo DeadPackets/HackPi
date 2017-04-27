@@ -101,7 +101,7 @@ var server = https.createServer(options, app).listen(port, () => {
 app.use(express.static(__dirname + '/web'));
 
 //SOCKET.IO INIT
-const io = IO(server);
+export const io = IO(server);
 
 //HTTP GET RULES
 app.get(/^(.+)$/, (req, res) => {

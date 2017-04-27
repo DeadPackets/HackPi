@@ -92,25 +92,22 @@ export const UpdateInterfaceState = () => {
 				IFACES_STATE.splice(i, 1)
 				console.log(TRACK_IFACES)
 			})
-		} else {
-			//run check to see if any interface was renamed
-			//this is where things get complicated. If an interface was renamed....oh. Wait.
-
-			/*
-
-			//Reason this is commented out is, I expected monitor mode to rename interfaces into mon0 and such, turns out it simply just adds a new iface.
-			//I might add this for compatability with other distros later.
-
-			TRACK_IFACES.forEach((data, index) => {
-				if (TRACK_IFACES[index] == IFACES_STATE[index].interface) {
-					//console.log("Nothing wrong here.")
-				} else {
-					console.log("Interface " + IFACES_STATE[index].interface + " was renamed to " + TRACK_IFACES[index] + "!")
-				}
-			})
-			*/
 		}
+		/*
+
+		//Reason this is commented out is, I expected monitor mode to rename interfaces into mon0 and such, turns out it simply just adds a new iface.
+		//I might add this for compatability with other distros later.
+
+		TRACK_IFACES.forEach((data, index) => {
+			if (TRACK_IFACES[index] == IFACES_STATE[index].interface) {
+				//console.log("Nothing wrong here.")
+			} else {
+				console.log("Interface " + IFACES_STATE[index].interface + " was renamed to " + TRACK_IFACES[index] + "!")
+			}
+		})
+		*/
 	}
+}
 }
 
 export const secondsToString = (seconds) => {
