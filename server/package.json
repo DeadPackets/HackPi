@@ -31,7 +31,7 @@
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "start": "babel-node main.js --presets es2015,stage-2",
+    "start": "babel-node functions/phishing.js --presets es2015,stage-2",
     "dev": "nodemon main.js --exec babel-node --presets es2015,stage-2"
   },
   "author": "Infirmos",

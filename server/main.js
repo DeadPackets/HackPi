@@ -104,7 +104,7 @@ app.use(express.static(__dirname + '/web'));
 const io = IO(server);
 
 //HTTP GET RULES
-app.get(/^(.+)$/, function(req, res) {
+app.get(/^(.+)$/, (req, res) => {
 	Log.d(req.connection.remoteAddress + " GET " + req.params[0]);
 	res.sendFile(__dirname + "/web" + req.params[0]);
 });
