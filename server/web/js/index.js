@@ -172,6 +172,9 @@
     				if (wirelessdata) {
     					if (wirelessdata.mode == "master") {
     						$('#' + ifacename + ' .panel-heading').append('   <span class="label label-primary">Master Mode</span>')
+    					} else if (isbusy == false && isup == true) {
+    						$('#wifi-scan-interface-list').html('')
+    						$('#wifi-scan-interface-list').append('<option>' + ifacename + '</option>')
     					}
     				}
     			}
@@ -259,3 +262,13 @@
     setInterval(function() {
     	UpdateInterfaces()
     }, 2000)
+
+
+    $('.scan-wifi').click(function() {
+    	var iface = $('#wifi-scan-interface-list').val()
+    	socket.emit('scan wifi', iface)
+    })
+
+    socket.on('new wifi', function(type, data) {
+    	console.log(type, data)
+    })

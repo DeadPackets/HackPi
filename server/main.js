@@ -84,8 +84,6 @@ import {
 	DisconnectWifi,
 	CheckAllIfaces,
 	ConnectToWifi,
-	StartMainWifiIface,
-	StopMainWifiIface
 } from './functions/wifi';
 
 import bluetooth from './functions/bluetooth';
@@ -104,7 +102,6 @@ app.use(express.static(__dirname + '/web'));
 
 //SOCKET.IO INIT
 const io = IO(server);
-
 
 //HTTP GET RULES
 app.get("/", (req, res) => {
@@ -138,8 +135,10 @@ io.on('connection', (socket) => {
 		ScanTarget(iface, target, cb)
 	})
 
-	socket.on('scan wifi', (iface, cb) => {
-		ScanWifi(iface, cb)
+	socket.on('scan wifi', (iface) => {
+		ScanWifi(iface, function(st, data) {
+			socket.emit('new wifi', st, data)
+		})
 	})
 
 	socket.on('list wireless', (cb) => {
@@ -158,13 +157,6 @@ io.on('connection', (socket) => {
 		DisconnectWifi(iface, cb)
 	})
 
-	socket.on('start wifi', (iface) => {
-		StartMainWifiIface(iface, cb)
-	})
-
-	socket.on('stop wifi', (iface) => {
-		StopMainWifiIface(iface, cb)
-	})
 
 	socket.on('scan bluetooth', (iface) => {
 		//bluetooth scanning here

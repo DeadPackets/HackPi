@@ -21,13 +21,20 @@ import {
 	exec,
 	spawn
 } from 'child_process';
+import NewWifiResult from '../main';
+import {
+	TRACK_IFACES
+} from './fn';
+import IFACES_STATE from './fn';
 
-var WIFI = [];
+var WIFI;
 
-export const StartWifiIface = (iface, cb) => {
-
+export const ScanWifi = (iface, cb) => {
+	//check for busy stuff
+	console.log("Starting scan on interface " + iface)
 	var wifi = new Wireless({
-		iface: iface
+		iface: iface,
+		vanishThreshold: 3
 	})
 
 	var wireless = {
@@ -43,35 +50,43 @@ export const StartWifiIface = (iface, cb) => {
 		}
 	})
 
-	/*
-		wifi.on('appear', (data, iface) => {
-			console.log(data)
-		})
+	wifi.start()
 
-		wifi.on('vanish', (data, iface) => {
-			//console.log(data)
-		})
+	//mark interface as busy
 
-		wifi.on('signal', (data, iface) => {
-			//signal changes
-		})
+	var i = TRACK_IFACES.indexOf(iface)
+	IFACES_STATE[i].state.busy = true
+	IFACES_STATE[i].state.process = 'Scanning for WiFi'
 
-		wifi.on('change', (data, iface) => {
-			//properties change
-		})
+	wifi.on('appear', (data, iface) => {
+		cb("data", data)
+	})
 
-		wifi.on('error', (err, iface) => {
-			console.log(err)
-		})
+	wifi.on('vanish', (data, iface) => {
+		//console.log(data)
+	})
 
-		wifi.on('empty', (data, iface) => {
-			//empty network scan
-		})
-		*/
+	wifi.on('signal', (data, iface) => {
+		//signal changes
+	})
+
+	wifi.on('change', (data, iface) => {
+		//properties change
+	})
+
+	wifi.on('error', (err, iface) => {
+		console.log(err)
+	})
+
+	wifi.on('empty', (data, iface) => {
+		//empty network scan
+		console.log("empty", data)
+	})
+
 }
 
 export const StopMainWifiIface = (cb) => {
-	WIFI.stop(function(data) {
+	WIFI.wifi.stop(function(data) {
 		cb(data)
 	})
 }
@@ -85,8 +100,6 @@ export const CheckIfaceState = (iface, cb) => {
 		cb('success', status)
 	});
 }
-
-export const ScanWifi = (iface, cb) => {}
 
 export const DisconnectWifi = (iface, cb) => {
 	//I think this purely depends on the security of the connected router

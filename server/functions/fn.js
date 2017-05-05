@@ -18,8 +18,8 @@ import ip from 'ip';
 import prettyBytes from 'pretty-bytes';
 import oui from 'oui';
 
-var IFCONFIG_IFACES = [];
-var TRACK_IFACES = [];
+export var IFCONFIG_IFACES = [];
+export var TRACK_IFACES = [];
 var IFACES_STATE = [];
 export default IFACES_STATE;
 /*
