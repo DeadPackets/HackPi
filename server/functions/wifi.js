@@ -26,12 +26,12 @@ import {
 	TRACK_IFACES
 } from './fn';
 import IFACES_STATE from './fn';
-
 var WIFI;
 
 export const ScanWifi = (iface, cb) => {
 	//check for busy stuff
 	console.log("Starting scan on interface " + iface)
+
 	var wifi = new Wireless({
 		iface: iface,
 		vanishThreshold: 3
