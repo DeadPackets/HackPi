@@ -13,6 +13,7 @@ import nmap from 'node-nmap';
 import xml2js from 'xml2js';
 import ip from 'ip';
 import prettyBytes from 'pretty-bytes';
+import oui from 'oui';
 
 var IFCONFIG_IFACES = [];
 var TRACK_IFACES = [];
@@ -168,7 +169,11 @@ export const UpdateInterfaceInfo = () => {
 			SYSINFO.interfaces = interfaces
 			IFCONFIG_IFACES = []
 			interfaces.forEach((data, index) => {
+				var mac = SYSINFO.interfaces[index].address
 				IFCONFIG_IFACES.push(data.interface)
+				if (mac !== undefined) {
+					SYSINFO.interfaces[index].vendor = oui(mac).split(/\r?\n/)[0]
+				}
 			})
 		}
 	})

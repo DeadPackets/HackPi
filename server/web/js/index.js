@@ -1,7 +1,8 @@
     var socket = io.connect({
     	secure: true
     })
-
+    var sysdata;
+    var firstload = true
     /*
     var options = {
     	autoResize: true,
@@ -112,9 +113,39 @@
     //  socket.emit('scan local', 'eth0', DrawNetwork(state, data, scantime))
 
 */
+
+    function UpdateInterfaces() {
+    	$('.interface-list').html('')
+    	for (var i = 0; i < sysdata.interfaces.length; i++) {
+    		var iface = sysdata.interfaces[i]
+    		var mac = iface.address || null
+    		var vendor = null
+    		if (mac) {
+    			vendor = iface.vendor
+    		}
+    		var ifacename = iface.interface
+    		var ipv4addr = iface.ipv4_address || null
+    		var ipv6addr = iface.ipv6_address || null
+    		var isloopback = iface.loopback || false
+    		var isup = iface.up
+    		var isrunning = iface.running || false
+    		if (iface.interface.indexOf('wlan') < 0) {
+    			var type = iface.link
+    		} else if (iface.interface.indexOf('mon') < 0) {
+    			var type = 'wireless'
+    		} else {
+    			var type = 'monitor-mode'
+    		}
+    		var broadcast = iface.broadcast || false
+    		var multicast = iface.multicast || false
+    		$('.interface-list').append('<li class="list-group-item"><a data-toggle="collapse" href="#' +
+    			ifacename + '">' + ifacename + '</a>  <span class="label label-default">' + type + '</span></li><div id="' + ifacename + '" class="panel-collapse collapse"><div class="panel-footer"><p class="interface-mac">' + mac + '</p><p class="interface-vendor">' + vendor + '</p><p class="interface-isup">' + isup + '</p>/div></div>')
+    		//console.log(ifacename + " " + mac + " " + type)
+    	}
+    }
     setInterval(function() {
     	socket.emit('get system info', function(data) {
-
+    		sysdata = data
     		//Parsing general data
     		var uptime = data.uptime
     		var osuptime = data.osuptime
@@ -151,25 +182,34 @@
     		}
 
     		//Parsing interface data
-    		for (var i = 0; i < data.interfaces.length; i++) {
-    			var iface = data.interfaces[i]
-    			var mac = iface.address || null
-    			var ifacename = iface.interface
-    			var ipv4addr = iface.ipv4_address || null
-    			var ipv6addr = iface.ipv6_address || null
-    			var isloopback = iface.loopback || false
-    			var isup = iface.up
-    			var isrunning = iface.running || false
-    			if (iface.interface.indexOf('wlan') < 0) {
-    				var type = iface.link
-    			} else if (iface.interface.indexOf('mon') < 0) {
-    				var type = 'wireless'
-    			} else {
-    				var type = 'monitor-mode'
+    		if (firstload == true) {
+    			for (var i = 0; i < sysdata.interfaces.length; i++) {
+    				var iface = sysdata.interfaces[i]
+    				var mac = iface.address || null
+    				var vendor = null
+    				if (mac) {
+    					vendor = iface.vendor
+    				}
+    				var ifacename = iface.interface
+    				var ipv4addr = iface.ipv4_address || null
+    				var ipv6addr = iface.ipv6_address || null
+    				var isloopback = iface.loopback || false
+    				var isup = iface.up
+    				var isrunning = iface.running || false
+    				if (iface.interface.indexOf('wlan') < 0) {
+    					var type = iface.link
+    				} else if (iface.interface.indexOf('mon') < 0) {
+    					var type = 'wireless'
+    				} else {
+    					var type = 'monitor-mode'
+    				}
+    				var broadcast = iface.broadcast || false
+    				var multicast = iface.multicast || false
+    				$('.interface-list').append('<li class="list-group-item"><a data-toggle="collapse" href="#' +
+    					ifacename + '">' + ifacename + '</a>  <span class="label label-default">' + type + '</span></li><div id="' + ifacename + '" class="panel-collapse collapse"><div class="panel-footer"><p class="interface-mac">' + mac + '</p><p class="interface-vendor">' + vendor + '</p><p class="interface-isup">' + isup + '</p></div></div>')
+    				//console.log(ifacename + " " + mac + " " + type)
+    				firstload = false
     			}
-    			var broadcast = iface.broadcast || false
-    			var multicast = iface.multicast || false
-    			//console.log(ifacename + " " + mac + " " + type)
     		}
     	})
     }, 600)

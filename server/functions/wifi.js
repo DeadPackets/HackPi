@@ -35,7 +35,7 @@ export const StartWifiIface = (iface, cb) => {
 		wifi: wifi
 	}
 
-	WIFI.push(wireless)
+	WIFI = wireless
 
 	wifi.enable((err) => {
 		if (err) {
@@ -69,6 +69,7 @@ export const StartWifiIface = (iface, cb) => {
 		})
 		*/
 }
+
 export const StopMainWifiIface = (cb) => {
 	WIFI.stop(function(data) {
 		cb(data)
