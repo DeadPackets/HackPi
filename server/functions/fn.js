@@ -3,6 +3,9 @@ import fs from 'fs';
 import si from 'systeminformation';
 import os from 'os';
 import ifconfig from 'wireless-tools/ifconfig'
+import {
+	CheckIfaceState
+} from './wifi';
 import SYSINFO from '../main';
 import _ from 'underscore';
 import {
@@ -62,7 +65,8 @@ export const UpdateInterfaceState = () => {
 				}
 			}
 			IFACES_STATE.push(obj)
-			console.log("Added interface " + data + "!")
+
+			//console.log("Added interface " + data + "!")
 		})
 		//not first time anymore
 		firstrun = false
@@ -72,7 +76,6 @@ export const UpdateInterfaceState = () => {
 			//new interface plugged in
 			var diff = _.difference(IFCONFIG_IFACES, TRACK_IFACES) //returns new interface name
 			diff.forEach((data, index) => {
-				console.log("Interface " + data + " was added.", TRACK_IFACES)
 				TRACK_IFACES.push(data)
 				var obj = {
 					interface: data,
@@ -82,7 +85,7 @@ export const UpdateInterfaceState = () => {
 					}
 				}
 				IFACES_STATE.push(obj)
-				console.log(TRACK_IFACES)
+				console.log("Interface " + data + " was added.", TRACK_IFACES)
 			})
 		} else if (IFCONFIG_IFACES.length < TRACK_IFACES.length) {
 			//interface disconnected
@@ -92,7 +95,7 @@ export const UpdateInterfaceState = () => {
 				var i = TRACK_IFACES.indexOf(data)
 				TRACK_IFACES.splice(i, 1)
 				IFACES_STATE.splice(i, 1)
-				console.log(TRACK_IFACES)
+				//console.log(TRACK_IFACES)
 			})
 		}
 		/*
@@ -170,10 +173,21 @@ export const UpdateInterfaceInfo = () => {
 			IFCONFIG_IFACES = []
 			interfaces.forEach((data, index) => {
 				var mac = SYSINFO.interfaces[index].address
+				var ifacename = SYSINFO.interfaces[index].interface
 				IFCONFIG_IFACES.push(data.interface)
 				if (mac !== undefined) {
 					SYSINFO.interfaces[index].vendor = oui(mac).split(/\r?\n/)[0]
 				}
+				if (ifacename.indexOf('wlan') < 0) {} else if (ifacename.indexOf('mon') < 0) {
+					CheckIfaceState(ifacename, function(status, data) {
+						if (status == 'fail') {
+							console.logo("Error!", data)
+						} else {
+							SYSINFO.interfaces[index].wirelessdata = data
+						}
+					})
+				}
+
 			})
 		}
 	})

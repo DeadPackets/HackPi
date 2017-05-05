@@ -3,6 +3,7 @@
     })
     var sysdata;
     var firstload = true
+    var IFACES_STATE = [];
     /*
     var options = {
     	autoResize: true,
@@ -123,12 +124,17 @@
     		if (mac) {
     			vendor = iface.vendor
     		}
-    		var ifacename = iface.interface
-    		var ipv4addr = iface.ipv4_address || null
-    		var ipv6addr = iface.ipv6_address || null
-    		var isloopback = iface.loopback || false
-    		var isup = iface.up
-    		var isrunning = iface.running || false
+    		if (IFACES_STATE[i]) {
+    			var iface_state = IFACES_STATE[i]
+    			var isbusy;
+    			var isbusy_process;
+    			if (iface_state.state.busy == true) {
+    				isbusy = true
+    				isbusy_process = iface_state.state.process
+    			} else {
+    				isbusy = false
+    			}
+    		}
     		if (iface.interface.indexOf('wlan') < 0) {
     			var type = iface.link
     		} else if (iface.interface.indexOf('mon') < 0) {
@@ -136,15 +142,81 @@
     		} else {
     			var type = 'monitor-mode'
     		}
+    		var wirelessdata = iface.wirelessdata
+    		var ifacename = iface.interface
+    		var ipv4addr = iface.ipv4_address || null
+    		var ipv6addr = iface.ipv6_address || null
+    		var isloopback = iface.loopback || false
+    		var isup = iface.up
+    		var isrunning = iface.running || false
     		var broadcast = iface.broadcast || false
     		var multicast = iface.multicast || false
-    		$('.interface-list').append('<li class="list-group-item"><a data-toggle="collapse" href="#' +
-    			ifacename + '">' + ifacename + '</a>  <span class="label label-default">' + type + '</span></li><div id="' + ifacename + '" class="panel-collapse collapse"><div class="panel-footer"><p class="interface-mac">' + mac + '</p><p class="interface-vendor">' + vendor + '</p><p class="interface-isup">' + isup + '</p>/div></div>')
-    		//console.log(ifacename + " " + mac + " " + type)
+    		$('.interface-list').append('<div class="panel panel-default" id="' + ifacename + '"><div class="panel-heading">' + ifacename + '</div><div class="panel-body"><p class="interface-mac">Mac: ' + mac + '</p><p class="interface-vendor">Vendor: ' + vendor + '</p><p class="interface-type">Type: ' + type + '</p><p class="interface-isup">IsUP: ' + isup + '</p></div></div>')
+    		if (IFACES_STATE[i]) {
+    			//check if busy
+    			if (isbusy == true) {
+    				$('#' + ifacename + ' .panel-heading').append('   <span class="label label-danger">BUSY</span>')
+    			}
+
+    			//check if connected
+    			if (isloopback !== true && ipv4addr !== null) {
+    				$('#' + ifacename + ' .panel-heading').append('   <span class="label label-success">CONNECTED</span>')
+    				$('#' + ifacename + ' .panel-body').append('<p class="interface-ipv4-addr">IPv4: ' + ipv4addr + '</p>')
+    			} else if (isloopback !== true && ipv6addr !== null) {
+    				$('#' + ifacename + ' .panel-heading').append('   <span class="label label-success">CONNECTED</span>')
+    				$('#' + ifacename + ' .panel-body').append('<p class="interface-ipv6-addr">IPv6: ' + ipv6addr + '</p>')
+    			}
+
+    			//if wireless
+    			if (type == 'wireless') {
+    				if (wirelessdata) {
+    					if (wirelessdata.mode == "master") {
+    						$('#' + ifacename + ' .panel-heading').append('   <span class="label label-primary">Master Mode</span>')
+    					}
+    				}
+    			}
+
+
+    		}
     	}
     }
+
+    socket.on('updated interfaces', function() {
+    	UpdateInterfaces()
+    })
+
     setInterval(function() {
+
+    	socket.emit('get interface state', function(data) {
+    		IFACES_STATE = data
+    	})
     	socket.emit('get system info', function(data) {
+    		if (sysdata) {
+    			var sysinterfaces = [];
+    			sysdata.interfaces.forEach(function(dt, index) {
+    				sysinterfaces.push(dt.interface)
+    			})
+
+    			var datainterfaces = [];
+    			data.interfaces.forEach(function(dt, index) {
+    				datainterfaces.push(dt.interface)
+    			})
+
+    			if (data.interfaces.length > sysdata.interfaces.length) {
+    				//new interface
+    				var diff = _.difference(datainterfaces, sysinterfaces)
+    				diff.forEach(function(data, index) {
+    					console.log(data + " was added.") //TODO: Proper alerts!
+    				})
+    			} else if (data.interfaces.length < sysdata.interfaces.length) {
+    				//removed interface
+    				var diff = _.difference(sysinterfaces, datainterfaces)
+    				diff.forEach(function(data, index) {
+    					console.log(data + " was removed.") //TODO: Proper alerts!
+    				})
+    			}
+    		}
+
     		sysdata = data
     		//Parsing general data
     		var uptime = data.uptime
@@ -178,38 +250,12 @@
     			var fssize = fs.size
     			var fsused = fs.used
     			var fsusedpercent = fs.use
-    			$('.fs').append(`<div id="fs-disk-${i}">${fs} ${disk} ${mountpoint} ${fstype}</div>`)
-    		}
-
-    		//Parsing interface data
-    		if (firstload == true) {
-    			for (var i = 0; i < sysdata.interfaces.length; i++) {
-    				var iface = sysdata.interfaces[i]
-    				var mac = iface.address || null
-    				var vendor = null
-    				if (mac) {
-    					vendor = iface.vendor
-    				}
-    				var ifacename = iface.interface
-    				var ipv4addr = iface.ipv4_address || null
-    				var ipv6addr = iface.ipv6_address || null
-    				var isloopback = iface.loopback || false
-    				var isup = iface.up
-    				var isrunning = iface.running || false
-    				if (iface.interface.indexOf('wlan') < 0) {
-    					var type = iface.link
-    				} else if (iface.interface.indexOf('mon') < 0) {
-    					var type = 'wireless'
-    				} else {
-    					var type = 'monitor-mode'
-    				}
-    				var broadcast = iface.broadcast || false
-    				var multicast = iface.multicast || false
-    				$('.interface-list').append('<li class="list-group-item"><a data-toggle="collapse" href="#' +
-    					ifacename + '">' + ifacename + '</a>  <span class="label label-default">' + type + '</span></li><div id="' + ifacename + '" class="panel-collapse collapse"><div class="panel-footer"><p class="interface-mac">' + mac + '</p><p class="interface-vendor">' + vendor + '</p><p class="interface-isup">' + isup + '</p></div></div>')
-    				//console.log(ifacename + " " + mac + " " + type)
-    				firstload = false
-    			}
+    			//$('.fs').append(`<div id="fs-disk-${i}">${fs} ${disk} ${mountpoint} ${fstype}</div>`)
     		}
     	})
     }, 600)
+
+
+    setInterval(function() {
+    	UpdateInterfaces()
+    }, 2000)

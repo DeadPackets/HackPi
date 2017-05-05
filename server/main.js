@@ -76,6 +76,7 @@ import {
 	UpdateInterfaceState
 } from './functions/fn';
 
+import IFACES_STATE from './functions/fn';
 
 import {
 	ScanWifi,
@@ -123,6 +124,10 @@ io.on('connection', (socket) => {
 	socket.on('get system info', (callback) => {
 		callback(SYSINFO)
 		UpdateInterfaceState()
+	})
+
+	socket.on('get interface state', (callback) => {
+		callback(IFACES_STATE)
 	})
 
 	socket.on('scan local', (iface, cb) => {
