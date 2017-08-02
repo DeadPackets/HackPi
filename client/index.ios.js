@@ -22,12 +22,12 @@ export default class HackPi extends Component {
   componentWillMount() {
     AsyncStorage.getItem('@HackPi:IP', (err, result)=>{
       if(err) {
-        console.log(err)
+        //console.log(err)
         this.setState({
           error: true
         })
       } else {
-        console.log(result)
+        //console.log(result)
         if(result){
           this.socket = io.connect(result, { secure: false, jsonp: false, reconnectionDelay: 5000, transports: ['websocket'], upgrade: false, debug: true })
         } else {
@@ -39,7 +39,7 @@ export default class HackPi extends Component {
 
   }
   render() {
-    console.log(!this.state.error && this.socket)
+    //console.log(!this.state.error && this.socket)
     if(!this.state.error && this.socket){
     //will implement Navigator soon
     var appropriateScreen;

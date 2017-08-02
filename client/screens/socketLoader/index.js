@@ -22,7 +22,7 @@ export default class SocketLoader extends Component {
 
   componentDidMount() {
     var socket = this.props.socket;
-    console.log(socket)
+  //  console.log(socket)
     socket.on('connect_error', (data)=>{
       this.setState({ status: data.toString().toUpperCase(), red: true })
     })
@@ -39,7 +39,7 @@ export default class SocketLoader extends Component {
       'New IP',
       'This will be used to make the socket connection.',
       [
-        {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: 'Cancel', onPress: () => /*console.log('Cancel Pressed')*/, style: 'cancel'},
         {text: 'OK', onPress: ip => {
           AsyncStorage.setItem('@HackPi:IP', ip)
         }},

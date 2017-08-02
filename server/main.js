@@ -136,8 +136,8 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('scan wifi', (iface) => {
-		ScanWifi(iface, function(st, data) {
-			socket.emit('new wifi', st, data)
+		ScanWifi(iface, function(state, data) {
+			socket.emit('new wifi', state, data)
 		})
 	})
 
