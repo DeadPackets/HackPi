@@ -1,3 +1,4 @@
+# Note: This is unfinished! (Full rewrite of server backend in progress)
 # HackPi - Portable Hacking Mothership
 
 ### Overview
